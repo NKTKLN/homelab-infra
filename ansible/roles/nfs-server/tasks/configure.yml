@@ -1,14 +1,24 @@
-- name: Check if virtiofs directory exists
-  stat:
+- name: Ensure virtiofs mount directory exists
+  ansible.builtin.file:
     path: "{{ virtiofs_mount_path }}"
-  register: mount_dir_info
-- name: Configure exports.
-  blockinfile:
-    path: /etc/exports
-    marker: "# {mark} ANSIBLE GENERATED CONFIG BLOCK"
-    block: "{{ lookup('template', 'exports.j2') }}"
-  when: mount_dir_info.stat.isdir
-- name: Re-read NFS exports
-  command: exportfs -ra
-  notify: restart nfs server
-  when: mount_dir_info.stat.isdir
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Ensure exports.d directory exists
+  ansible.builtin.file:
+    path: /etc/exports.d
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Configure NFS exports (role-managed)
+  ansible.builtin.template:
+    src: exports.j2
+    dest: /etc/exports.d/virtiofs.exports
+    owner: root
+    group: root
+    mode: "0644"
+  notify: reload nfs exports

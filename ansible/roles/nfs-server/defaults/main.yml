@@ -1,1 +1,8 @@
-virtiofs_mount_path: "/mnt/hard-drive"
+# Storage mount
+virtiofs_mount_path: "/mnt/hard-drive" # mount point used for exports
+
+# NFS exports
+nfs_exports:
+  - path: "{{ virtiofs_mount_path }}"
+    clients: "192.168.1.0/24" # allowed network (CIDR)
+    options: "rw,sync,no_subtree_check" # export options

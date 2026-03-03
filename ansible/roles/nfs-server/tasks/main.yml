@@ -1,10 +1,10 @@
-# Main task file for the nfs-server role.
-# Includes logically separated task files grouped by feature.
 - name: Ensure Debian family
   ansible.builtin.assert:
     that: ansible_facts.os_family == "Debian"
     fail_msg: "This role supports only Debian/Ubuntu."
-- include_tasks: setup.yml
-  tags: [setup]
-- include_tasks: configure.yml
-  tags: [configure]
+
+- ansible.builtin.import_tasks: install.yml
+  tags: [nfs, install]
+
+- ansible.builtin.import_tasks: configure.yml
+  tags: [nfs, configure]
