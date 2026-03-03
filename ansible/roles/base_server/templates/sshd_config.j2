@@ -22,9 +22,9 @@ AllowAgentForwarding yes
 AllowTcpForwarding yes
 
 # Limit algorithms to modern, secure options.
-KexAlgorithms { % for alg in ssh_kex_algorithms %}{{ alg }} {% endfor %}
-Ciphers { % for cipher in ssh_ciphers %}{{ cipher }} {% endfor %}
-MACs { % for mac in ssh_macs %}{{ mac }} {% endfor %}
+KexAlgorithms {% for alg in ssh_kex_algorithms %}{{ alg }} {% endfor %}
+Ciphers {% for cipher in ssh_ciphers %}{{ cipher }} {% endfor %}
+MACs {% for mac in ssh_macs %}{{ mac }} {% endfor %}
 
 LoginGraceTime 30
 MaxAuthTries 5

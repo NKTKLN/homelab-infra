@@ -22,7 +22,7 @@ set -e
 # ========================================================
 
 # -------- CONFIG --------
-INVENTORY_FILE="../ansible/inventory/hosts.ini"
+INVENTORY_FILE="../ansible/inventory/home/hosts.ini"
 # -------------------------
 
 # -------- COLORS --------

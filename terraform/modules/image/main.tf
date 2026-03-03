@@ -7,4 +7,6 @@ resource "proxmox_virtual_environment_download_file" "image" {
 
   url       = var.image_url
   file_name = var.image_file_name
+
+  overwrite = false
 }

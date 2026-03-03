@@ -19,6 +19,13 @@ chpasswd:
 
 package_update: true
 package_upgrade: false
+packages:
+  - qemu-guest-agent
 
 timezone: ${timezone}
 locale: ${locale}
+
+runcmd:
+  - systemctl daemon-reload
+  - systemctl enable --now qemu-guest-agent
+  - systemctl --no-pager --full status qemu-guest-agent || true
