@@ -1,6 +1,9 @@
-# Default variables for the fail2ban role.
-# These values can be overridden in group_vars/host_vars per environment.
-# Fail2ban parameters for SSH brute-force protection.
-fail2ban_maxretry: 5 # Number of failed attempts before banning
-fail2ban_findtime: 600 # Time window (seconds) for counting failures
-fail2ban_bantime: 3600 # Ban duration in seconds
+# Fail2ban (SSH jail)
+fail2ban_sshd_enabled: true # enable SSH jail
+fail2ban_sshd_maxretry: 5 # failed attempts before ban
+fail2ban_sshd_findtime: 600 # time window for counting failures (seconds)
+fail2ban_sshd_bantime: 3600 # ban duration (seconds)
+
+# Log source (depends on distro/logging setup)
+fail2ban_sshd_logpath: /var/log/auth.log
+fail2ban_sshd_backend: systemd # use systemd journal (recommended on modern Debian/Ubuntu)

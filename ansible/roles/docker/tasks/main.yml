@@ -3,8 +3,8 @@
     that: ansible_facts.os_family == "Debian"
     fail_msg: "This role supports only Debian/Ubuntu."
 
-- ansible.builtin.import_tasks: setup.yml
-  tags: [setup]
+- ansible.builtin.import_tasks: install.yml
+  tags: [docker, install]
 
 - ansible.builtin.import_tasks: group.yml
-  tags: [group]
+  tags: [docker, group]
