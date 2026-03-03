@@ -1,9 +1,4 @@
-# Handlers for base_container role.
 - name: restart ssh
-  service:
+  ansible.builtin.service:
     name: ssh
     state: restarted
-    enabled: true
-- name: Reload sysctl
-  command: sysctl --system
-  changed_when: false # Reload is idempotent and does not imply actual changes

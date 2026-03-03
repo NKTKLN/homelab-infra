@@ -1,8 +1,10 @@
-# Harden SSH daemon configuration using a managed template.
-- name: Harden SSH configuration
-  template:
+- name: Deploy sshd_config
+  ansible.builtin.template:
     src: sshd_config.j2
     dest: /etc/ssh/sshd_config
-    mode: 0600
+    owner: root
+    group: root
+    mode: "0644"
+    validate: "{{ ssh_validate_command if ssh_validate_config | bool else omit }}"
   notify: restart ssh
-  when: common_harden_ssh | bool
+  when: base_container_harden_ssh | bool

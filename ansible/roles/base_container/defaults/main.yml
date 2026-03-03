@@ -1,9 +1,33 @@
-# Default variables for the base_container role.
-# These values can be overridden in group_vars/host_vars per environment.
-# Enable stricter SSH configuration via template.
-common_harden_ssh: true
-# Default SSH port for this environment.
+# Debian autoremove/purge (can remove dependencies)
+base_container_cleanup_autoremove: true
+
+# Validate sshd_config before restart (prevents lockout)
+ssh_validate_config: true
+ssh_validate_command: "sshd -t -f %s"
+
+# Managed SSH hardening
+base_container_harden_ssh: true
+
 ssh_port: 22
+ssh_permit_root_login: "no" # or "prohibit-password"
+ssh_password_authentication: "no" # keys only
+ssh_pubkey_authentication: "yes"
+ssh_challenge_response_authentication: "no"
+ssh_use_pam: "yes"
+
+ssh_x11_forwarding: "no"
+ssh_allow_agent_forwarding: "no"
+ssh_allow_tcp_forwarding: "no"
+
+ssh_client_alive_interval: 300
+ssh_client_alive_count_max: 2
+ssh_login_grace_time: 30
+ssh_max_auth_tries: 5
+
+ssh_subsystem_sftp: "internal-sftp" # portable
+
+# WARNING: may break legacy clients
+ssh_limit_algorithms: true
 ssh_kex_algorithms: ["curve25519-sha256"]
 ssh_ciphers: ["chacha20-poly1305@openssh.com", "aes256-gcm@openssh.com"]
 ssh_macs: ["hmac-sha2-512", "hmac-sha2-256"]

@@ -1,27 +1,26 @@
 # Managed by Ansible - do not edit manually.
-# Hardened SSH configuration for all servers.
 
 Port {{ ssh_port }}
-PermitRootLogin yes
-PasswordAuthentication no
-PubkeyAuthentication yes
-ChallengeResponseAuthentication no
-UsePAM yes
-X11Forwarding no
+PermitRootLogin {{ ssh_permit_root_login }}
+PasswordAuthentication {{ ssh_password_authentication }}
+PubkeyAuthentication {{ ssh_pubkey_authentication }}
+ChallengeResponseAuthentication {{ ssh_challenge_response_authentication }}
+UsePAM {{ ssh_use_pam }}
+X11Forwarding {{ ssh_x11_forwarding }}
 
-# Required for file transfers (sftp/scp)
-Subsystem sftp /usr/lib/openssh/sftp-server
+Subsystem sftp {{ ssh_subsystem_sftp }}
 
-ClientAliveInterval 300
-ClientAliveCountMax 2
+ClientAliveInterval {{ ssh_client_alive_interval }}
+ClientAliveCountMax {{ ssh_client_alive_count_max }}
 PermitEmptyPasswords no
-AllowAgentForwarding yes
-AllowTcpForwarding yes
+AllowAgentForwarding {{ ssh_allow_agent_forwarding }}
+AllowTcpForwarding {{ ssh_allow_tcp_forwarding }}
 
-# Limit algorithms to modern, secure options.
-KexAlgorithms { % for alg in ssh_kex_algorithms %}{{ alg }} {% endfor %}
-Ciphers { % for cipher in ssh_ciphers %}{{ cipher }} {% endfor %}
-MACs { % for mac in ssh_macs %}{{ mac }} {% endfor %}
+{% if ssh_limit_algorithms | bool %}
+KexAlgorithms {{ ssh_kex_algorithms | join(',') }}
+Ciphers {{ ssh_ciphers | join(',') }}
+MACs {{ ssh_macs | join(',') }}
+{% endif %}
 
-LoginGraceTime 30
-MaxAuthTries 5
+LoginGraceTime {{ ssh_login_grace_time }}
+MaxAuthTries {{ ssh_max_auth_tries }}
