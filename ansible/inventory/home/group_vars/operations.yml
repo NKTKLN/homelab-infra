@@ -1,13 +1,16 @@
-# Special parameters for operations nodes
-# Common extra packages installed on operations servers.
+# Additional packages for operations nodes.
+# Focused on maintenance and basic troubleshooting.
 common_packages_extra:
-  - gnupg # GPG for signing/verifying packages
-  - apt-transport-https # Enables APT to use HTTPS repositories
-  - openssh-client # SSH client for remote access
-  - iproute2 # Modern network configuration tools
-  - iputils-ping # ping and related utilities
-  - lsof # Lists open files and sockets
-  - tree # Recursive directory listing
-  - yq # YAML/YML processor
-# Ports that will be allowed through UFW (when enabled).
-ufw_allowed_ports: ["{{ ssh_port }}"]
+  - gnupg
+  - apt-transport-https
+  - openssh-client
+  - iproute2
+  - iputils-ping
+  - lsof
+  - tree
+  - yq
+
+# Ports allowed by UFW when the firewall is enabled.
+# SSH port is configurable via `ssh_port`.
+ufw_allowed_ports:
+  - "{{ ssh_port }}"

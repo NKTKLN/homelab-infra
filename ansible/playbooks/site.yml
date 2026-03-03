@@ -1,5 +1,53 @@
-- import_playbook: base.yml
-- import_playbook: vpn.yml
-- import_playbook: sandbox.yml
-- import_playbook: operations.yml
-- import_playbook: storage.yml
+- name: Baseline for all VMs
+  hosts: vms
+  become: true
+  roles:
+    - role: common_baseline
+      tags: [baseline]
+    - role: base_server
+      tags: [base]
+
+- name: Baseline for all containers
+  hosts: containers
+  become: true
+  roles:
+    - role: common_baseline
+      tags: [baseline]
+    - role: base_container
+      tags: [base]
+
+- name: Operations servers
+  hosts: operations
+  become: true
+  roles:
+    - role: zsh
+      tags: [shell]
+    - role: fail2ban
+      tags: [security]
+    - role: operations_sever
+      tags: [operations]
+
+- name: Sandbox servers
+  hosts: sandbox
+  become: true
+  roles:
+    - role: zsh
+      tags: [shell]
+    - role: docker
+      tags: [docker]
+
+- name: Storage servers
+  hosts: storage
+  become: true
+  roles:
+    - role: virtiofs
+      tags: [storage]
+    - role: nfs-server
+      tags: [storage, nfs]
+
+- name: VPN servers
+  hosts: vpn
+  become: true
+  roles:
+    - role: wireguard
+      tags: [vpn]

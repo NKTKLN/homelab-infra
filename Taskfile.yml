@@ -143,7 +143,7 @@ tasks:
     cmds:
       - uv run yamllint -c ../.yamllint .
       - uv run ansible-lint .
-      - uv run ansible-playbook -i {{.ANSIBLE_INVENTORY}} playbooks/base.yml --syntax-check
+      - uv run ansible-playbook -i {{.ANSIBLE_INVENTORY}} playbooks/site.yml --syntax-check
 
   ansible-ping:
     desc: Ping all hosts from inventory
@@ -157,14 +157,14 @@ tasks:
     deps: [sync]
     dir: '{{.ANSIBLE_DIR}}'
     cmds:
-      - uv run ansible-playbook -i {{.ANSIBLE_INVENTORY}} playbooks/base.yml --check
+      - uv run ansible-playbook -i {{.ANSIBLE_INVENTORY}} playbooks/site.yml --check
 
   ansible-run:
     desc: Apply Ansible configuration
     deps: [sync]
     dir: '{{.ANSIBLE_DIR}}'
     cmds:
-      - uv run ansible-playbook -i {{.ANSIBLE_INVENTORY}} playbooks/base.yml
+      - uv run ansible-playbook -i {{.ANSIBLE_INVENTORY}} playbooks/site.yml
 
   ansible-deploy:
     desc: Lint → check → apply (safe workflow)
