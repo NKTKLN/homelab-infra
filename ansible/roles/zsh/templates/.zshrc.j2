@@ -44,13 +44,13 @@ fi
 # PLUGINS
 # -----------------------------
 # Syntax highlighting
-source {{ user_home }}/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source {{ zsh_dir }}/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # Autosuggestions
-source {{ user_home }}/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
+source {{ zsh_dir }}/zsh-autosuggestions/zsh-autosuggestions.zsh
 
 # Extra completions
-fpath=({{ user_home }}/.zsh/zsh-completions $fpath)
+fpath=({{ zsh_dir }}/zsh-completions $fpath)
 autoload -Uz compinit
 compinit
 

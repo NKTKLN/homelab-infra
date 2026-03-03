@@ -1,9 +1,9 @@
 # Docker APT repository
 docker_apt_repo_enabled: true # manage official Docker APT repo
 
-docker_apt_os: "{{ 'ubuntu' if ansible_distribution == 'Ubuntu' else 'debian' }}"
-docker_apt_release: "{{ ansible_distribution_release }}" # e.g. jammy, bookworm
-docker_apt_arch: "{{ 'amd64' if ansible_architecture == 'x86_64' else 'arm64' }}"
+docker_apt_os: "{{ 'ubuntu' if ansible_facts['distribution'] == 'Ubuntu' else 'debian' }}"
+docker_apt_release: "{{ ansible_facts['distribution_release'] }}"
+docker_apt_arch: "{{ 'amd64' if ansible_facts['architecture'] == 'x86_64' else 'arm64' }}"
 
 # Users to be added to the docker group
 docker_users: ["{{ ansible_user }}"]

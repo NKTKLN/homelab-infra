@@ -1,7 +1,7 @@
 - name: Deploy .zshrc
-  template:
+  ansible.builtin.template:
     src: .zshrc.j2
-    dest: "{{ user_home }}/.zshrc"
-    owner: "{{ username }}"
-    group: "{{ username }}"
-    mode: '0644'
+    dest: "{{ zsh_user_home }}/.zshrc"
+    mode: "0644"
+  become: true
+  become_user: "{{ zsh_user }}"

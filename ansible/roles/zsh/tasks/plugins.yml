@@ -1,18 +1,10 @@
-- name: Clone zsh syntax highlighting
-  git:
-    repo: https://github.com/zsh-users/zsh-syntax-highlighting.git
-    dest: "{{ user_home }}/.zsh/zsh-syntax-highlighting"
+- name: Install zsh plugins
+  ansible.builtin.git:
+    repo: "{{ item.repo }}"
+    dest: "{{ zsh_dir }}/{{ item.name }}"
     depth: 1
-    recursive: yes
-- name: Clone zsh autosuggestions
-  git:
-    repo: https://github.com/zsh-users/zsh-autosuggestions
-    dest: "{{ user_home }}/.zsh/zsh-autosuggestions"
-    depth: 1
-    recursive: yes
-- name: Clone zsh completions
-  git:
-    repo: https://github.com/zsh-users/zsh-completions
-    dest: "{{ user_home }}/.zsh/zsh-completions"
-    depth: 1
-    recursive: yes
+    recursive: true
+    update: true
+  loop: "{{ zsh_plugins }}"
+  become: true
+  become_user: "{{ zsh_user }}"

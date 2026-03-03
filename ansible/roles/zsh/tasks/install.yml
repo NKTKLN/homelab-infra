@@ -1,0 +1,19 @@
+- name: Install Zsh & FZF
+  ansible.builtin.package:
+    name:
+      - zsh
+      - fzf
+    state: present
+
+- name: Set default shell for user
+  user:
+    name: "{{ zsh_user }}"
+    shell: "{{ zsh_shell_path }}"
+
+- name: Create zsh dir
+  ansible.builtin.file:
+    path: "{{ zsh_dir }}"
+    state: directory
+    mode: "0755"
+  become: true
+  become_user: "{{ zsh_user }}"

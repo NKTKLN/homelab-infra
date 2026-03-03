@@ -1,8 +1,8 @@
-# Main task file for the zsh role.
-# Includes logically separated task files grouped by feature.
-- include_tasks: setup.yml
-  tags: [setup]
-- include_tasks: plugins.yml
-  tags: [plugins]
-- include_tasks: config.yml
-  tags: [config]
+- ansible.builtin.import_tasks: install.yml
+  tags: [zsh, install]
+
+- ansible.builtin.import_tasks: plugins.yml
+  tags: [zsh, plugins]
+
+- ansible.builtin.import_tasks: config.yml
+  tags: [zsh, config]
