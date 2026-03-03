@@ -1,20 +1,33 @@
-- name: Add Docker GPG apt key
-  apt_key:
-    url: https://download.docker.com/linux/ubuntu/gpg
-    state: present
-  when: ansible_facts['os_family'] == 'Debian'
+- name: Ensure apt keyrings dir
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: "0755"
+
+- name: Download Docker GPG key
+  ansible.builtin.get_url:
+    url: "https://download.docker.com/linux/{{ docker_apt_os }}/gpg"
+    dest: /etc/apt/keyrings/docker.gpg
+    mode: "0644"
+
 - name: Add Docker repository
-  apt_repository:
-    repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
+  ansible.builtin.apt_repository:
+    repo: "deb [arch={{ docker_apt_arch }}] https://download.docker.com/linux/{{ docker_apt_os }} {{ docker_apt_release }} stable"
     state: present
-  when: ansible_facts['os_family'] == 'Debian'
-- name: Update apt package index after adding Docker repo
-  apt:
-    update_cache: yes
-  when: ansible_facts['os_family'] == 'Debian'
-- name: Install Docker CE
-  apt:
-    name: docker-ce
-    state: latest
-  when: ansible_facts['os_family'] == 'Debian'
-  notify: start docker
+  when: docker_apt_repo_enabled | bool
+
+- name: Install Docker packages
+  ansible.builtin.apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Ensure Docker service is enabled and running
+  ansible.builtin.service:
+    name: docker
+    state: started
+    enabled: true

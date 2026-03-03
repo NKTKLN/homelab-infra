@@ -1,2 +1,9 @@
-# Default variables for the docker role.
-# These values can be overridden in group_vars/host_vars per environment.
+# Docker APT repository
+docker_apt_repo_enabled: true # manage official Docker APT repo
+
+docker_apt_os: "{{ 'ubuntu' if ansible_distribution == 'Ubuntu' else 'debian' }}"
+docker_apt_release: "{{ ansible_distribution_release }}" # e.g. jammy, bookworm
+docker_apt_arch: "{{ 'amd64' if ansible_architecture == 'x86_64' else 'arm64' }}"
+
+# Users to be added to the docker group
+docker_users: ["{{ ansible_user }}"]

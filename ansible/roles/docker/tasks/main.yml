@@ -1,6 +1,10 @@
-# Main task file for the docker role.
-# Includes logically separated task files grouped by feature.
-- include_tasks: setup.yml
+- name: Ensure Debian family
+  ansible.builtin.assert:
+    that: ansible_facts.os_family == "Debian"
+    fail_msg: "This role supports only Debian/Ubuntu."
+
+- ansible.builtin.import_tasks: setup.yml
   tags: [setup]
-- include_tasks: group.yml
+
+- ansible.builtin.import_tasks: group.yml
   tags: [group]

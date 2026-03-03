@@ -1,9 +1,12 @@
 - name: Ensure docker group exists
-  group:
+  ansible.builtin.group:
     name: docker
     state: present
-- name: Add current user to docker group
-  user:
-    name: "{{ ansible_user }}"
+
+- name: Add users to docker group
+  ansible.builtin.user:
+    name: "{{ item }}"
     groups: docker
-    append: yes
+    append: true
+  loop: "{{ docker_users }}"
+  when: docker_users | length > 0
