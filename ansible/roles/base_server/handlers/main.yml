@@ -1,11 +1,10 @@
-# Handlers for base_server role.
 - name: restart ssh
-  service:
+  ansible.builtin.service:
     name: ssh
     state: restarted
-    enabled: true
+
 - name: stop motd-news
-  service:
+  ansible.builtin.service:
     name: motd-news
     state: stopped
     enabled: false

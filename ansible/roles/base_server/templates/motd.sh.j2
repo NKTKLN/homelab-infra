@@ -1,42 +1,8 @@
 #!/bin/bash
-# Managed by Ansible - custom MOTD script.
+# Managed by Ansible. Custom MOTD shown on interactive logins.
+# Shows: load, memory, disk usage, available APT updates, IP, users, processes/zombies.
 
-# ========================================================
-# MOTD System Status Script
-# ========================================================
-#
-# Description:
-# This script displays a colorful and informative Message of the Day (MOTD)
-# when you log in to your server. It shows system load, and memory usage,
-# disk status, available updates, IP address, active users, and zombie processes.
-#
-# Requirements:
-# 1. Linux system (Debian/Ubuntu recommended).
-# 2. Utilities: awk, free, df, ps, last, hostname, bc.
-# 3. For update info: APT package manager.
-#
-# Configuration:
-# 1. Copy this script to /etc/profile.d/ for automatic execution on login:
-#    sudo cp motd.sh /etc/profile.d/motd.sh
-#    sudo chmod +x /etc/profile.d/motd.sh
-# 2. The script will run for all users on login (SSH or terminal).
-#
-# Variables to Configure:
-# - No manual configuration required. All values are detected automatically.
-#
-# Features:
-# - System Load: 1, 5, and 30 minute averages.
-# - CPU Usage: Color-coded based on usage.
-# - Memory Usage: Color-coded, shows used/total and percent.
-# - Disk Usage: Displays main and mounted disks.
-# - Available Updates: Number of upgradable packages (APT).
-# - Server IP: Main IP address.
-# - Active Users: Number of logged-in users.
-# - Tasks & Zombies: Total and zombie processes.
-#
-# ========================================================
-
-# Skip if not interactive shell
+# Interactive shells only
 [ -z "$PS1" ] && return
 [ -t 1 ] || return
 
@@ -50,11 +16,11 @@ RESET="\e[0m"
 
 echo -e ""
 
-# System Load
+# Load averages
 read LOAD_1 LOAD_5 LOAD_15 <<< "$(awk '{print $1,$2,$3}' /proc/loadavg)"
 echo -e "${CYAN}Load:${RESET} ${WHITE}${LOAD_1}${RESET} (1m) • ${WHITE}${LOAD_5}${RESET} (5m) • ${WHITE}${LOAD_15}${RESET} (15m)"
 
-# Memory Usage (Color Based on Usage)
+# Memory usage
 MEMORY_TOTAL=$(free -m | awk 'NR==2{print $2}')
 MEMORY_USED=$(free -m | awk 'NR==2{print $3}')
 MEMORY_PERCENT=$(awk "BEGIN {printf \"%.2f\", ($MEMORY_USED/$MEMORY_TOTAL)*100}")
@@ -66,51 +32,40 @@ elif (( $(echo "$MEMORY_PERCENT >= 30 && $MEMORY_PERCENT <= 75" | bc -l) )); the
 else
     MEM_COLOR=$RED
 fi
-
 echo -e "${CYAN}Memory Usage:${RESET} ${MEM_COLOR}${MEMORY_USED}/${MEMORY_TOTAL}MB (${MEMORY_PERCENT}%)${RESET}"
 
-# Disk Usage
+# Disk usage (root + /mnt/*)
 echo -e "${CYAN}Disk usage:${RESET}"
-
 df -h --output=source,pcent,target | grep -E '^/dev' | while read line; do
-  DEVICE=$(echo "$line" | awk '{print $1}')
   USAGE=$(echo "$line" | awk '{print $2}')
   MOUNT_POINT=$(echo "$line" | awk '{print $3}')
 
   if [[ "$MOUNT_POINT" == "/" ]]; then
     echo -e "  • ${WHITE}Main disk:${RESET} ${USAGE}"
   elif [[ "$MOUNT_POINT" == /mnt/* ]]; then
-    FOLDER_NAME=$(basename "$MOUNT_POINT")
-    echo -e "  • ${WHITE}${FOLDER_NAME}:${RESET} ${USAGE}"
+    echo -e "  • ${WHITE}$(basename "$MOUNT_POINT"):${RESET} ${USAGE}"
   fi
 done
 
-# Available Updates
+# Available updates (APT)
 if command -v apt >/dev/null; then
     if [[ -f /var/lib/update-notifier/updates-available ]]; then
         UPDATES=$(grep -oP '\d+(?= updates)' /var/lib/update-notifier/updates-available 2>/dev/null)
     else
-        # Fallback only if file missing
         UPDATES=$(apt-get -s dist-upgrade 2>/dev/null | grep -c "^Inst ")
     fi
-
-    if [[ "$UPDATES" =~ ^[0-9]+$ ]] && (( UPDATES > 0 )); then
-        echo -e "${CYAN}Available Updates:${RESET} ${WHITE}${UPDATES} packages${RESET}"
-    fi
+    [[ "$UPDATES" =~ ^[0-9]+$ ]] && (( UPDATES > 0 )) && \
+      echo -e "${CYAN}Available Updates:${RESET} ${WHITE}${UPDATES} packages${RESET}"
 fi
 
-# Current IP
 IP=$(hostname -I | awk '{print $1}')
 echo -e "${CYAN}Server IP:${RESET} ${WHITE}${IP}${RESET}"
 
-# Active Users
 USERS=$(who | wc -l)
 echo -e "${CYAN}Active Users:${RESET} ${WHITE}${USERS}${RESET}"
 
-# Task & Zombie Processes
 TASKS=$(ps ax --no-heading | wc -l)
 ZOMBIES=$(ps ax -o stat --no-heading | grep -c Z)
-
 echo -e "${CYAN}Tasks:${RESET} ${WHITE}${TASKS}${RESET}"
 ((ZOMBIES>0)) && echo -e "${CYAN}Zombies:${RESET} ${RED}${ZOMBIES}${RESET}"
 

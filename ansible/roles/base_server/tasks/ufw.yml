@@ -1,28 +1,40 @@
-# Configure UFW firewall when explicitly enabled.
 - name: Install UFW
-  apt:
+  ansible.builtin.apt:
     name: ufw
     state: present
+
 - name: Default deny incoming
   community.general.ufw:
     direction: incoming
     policy: deny
+
 - name: Default allow outgoing
   community.general.ufw:
     direction: outgoing
     policy: allow
+
+- name: Allow SSH port
+  community.general.ufw:
+    rule: allow
+    port: "{{ ssh_port }}"
+    proto: tcp
+
 - name: Allow needed TCP ports
   community.general.ufw:
     rule: allow
     port: "{{ item }}"
     proto: tcp
   loop: "{{ ufw_allowed_ports_tcp }}"
+  when: ufw_allowed_ports_tcp | length > 0
+
 - name: Allow needed UDP ports
   community.general.ufw:
     rule: allow
     port: "{{ item }}"
     proto: udp
   loop: "{{ ufw_allowed_ports_udp }}"
+  when: ufw_allowed_ports_udp | length > 0
+
 - name: Enable UFW
   community.general.ufw:
     state: enabled

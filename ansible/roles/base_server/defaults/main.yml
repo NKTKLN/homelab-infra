@@ -1,17 +1,40 @@
-# Default variables for the base_server role.
-# These values can be overridden in group_vars/host_vars per environment.
-perform_dist_upgrade: false
-# Enable host firewall (UFW).
-common_firewall_enabled: true
-# Enable stricter SSH configuration via template.
-common_harden_ssh: true
-# Default SSH user and port for this environment.
+# APT
+perform_dist_upgrade: false # full dist-upgrade (use with care)
+
+# MOTD
+base_server_manage_motd: true # manage custom MOTD and disable distro MOTD noise
+
+# Firewall (UFW)
+common_firewall_enabled: true # enable/maintain host firewall rules
+ufw_allowed_ports_tcp: [] # extra TCP ports to allow (SSH added separately if you do that in ufw.yml)
+ufw_allowed_ports_udp: [] # extra UDP ports to allow
+
+# Cleanup
+base_server_cleanup_autoremove: true # Debian autoremove/purge (can remove dependencies)
+
+# SSH hardening
+base_server_harden_ssh: true # manage sshd_config from template
 ssh_port: 22
-# Ports that will be allowed through UFW (when enabled).
-ufw_allowed_ports_tcp: ["{{ ssh_port }}"]
-ufw_allowed_ports_udp: []
-# List of users allowed to log in over SSH.
-ssh_allowed_users: ["{{ ansible_user }}"]
+ssh_permit_root_login: "no" # or "prohibit-password"
+ssh_password_authentication: "no" # keys only
+ssh_pubkey_authentication: "yes"
+ssh_challenge_response_authentication: "no"
+ssh_use_pam: "yes"
+ssh_x11_forwarding: "no"
+ssh_allow_agent_forwarding: "no"
+ssh_allow_tcp_forwarding: "no"
+ssh_client_alive_interval: 300
+ssh_client_alive_count_max: 2
+ssh_login_grace_time: 30
+ssh_max_auth_tries: 5
+ssh_subsystem_sftp: "internal-sftp" # portable across distros
+
+# SSH config safety
+ssh_validate_config: true # validate sshd_config before restart (prevents lockout)
+ssh_validate_command: "sshd -t -f %s"
+
+# SSH crypto policy
+ssh_limit_algorithms: true # WARNING: may break legacy clients
 ssh_kex_algorithms: ["curve25519-sha256"]
 ssh_ciphers: ["chacha20-poly1305@openssh.com", "aes256-gcm@openssh.com"]
 ssh_macs: ["hmac-sha2-512", "hmac-sha2-256"]

@@ -7,4 +7,3 @@
     mode: "0644"
     validate: "{{ ssh_validate_command if ssh_validate_config | bool else omit }}"
   notify: restart ssh
-  when: base_container_harden_ssh | bool

@@ -1,33 +1,29 @@
-# Debian autoremove/purge (can remove dependencies)
-base_container_cleanup_autoremove: true
+# Cleanup
+base_container_cleanup_autoremove: true # Debian autoremove/purge (can remove dependencies)
 
-# Validate sshd_config before restart (prevents lockout)
-ssh_validate_config: true
-ssh_validate_command: "sshd -t -f %s"
-
-# Managed SSH hardening
-base_container_harden_ssh: true
-
+# SSH hardening
+base_container_harden_ssh: true # manage sshd_config from template
 ssh_port: 22
 ssh_permit_root_login: "no" # or "prohibit-password"
 ssh_password_authentication: "no" # keys only
 ssh_pubkey_authentication: "yes"
 ssh_challenge_response_authentication: "no"
 ssh_use_pam: "yes"
-
 ssh_x11_forwarding: "no"
 ssh_allow_agent_forwarding: "no"
 ssh_allow_tcp_forwarding: "no"
-
 ssh_client_alive_interval: 300
 ssh_client_alive_count_max: 2
 ssh_login_grace_time: 30
 ssh_max_auth_tries: 5
+ssh_subsystem_sftp: "internal-sftp" # portable across distros
 
-ssh_subsystem_sftp: "internal-sftp" # portable
+# SSH config safety
+ssh_validate_config: true # validate sshd_config before restart (prevents lockout)
+ssh_validate_command: "sshd -t -f %s"
 
-# WARNING: may break legacy clients
-ssh_limit_algorithms: true
+# SSH crypto policy
+ssh_limit_algorithms: true # WARNING: may break legacy clients
 ssh_kex_algorithms: ["curve25519-sha256"]
 ssh_ciphers: ["chacha20-poly1305@openssh.com", "aes256-gcm@openssh.com"]
 ssh_macs: ["hmac-sha2-512", "hmac-sha2-256"]

@@ -3,6 +3,4 @@
     autoremove: true
     autoclean: true
     purge: true
-  when:
-    - ansible_facts['os_family'] == 'Debian'
-    - base_container_cleanup_autoremove | bool
+  when: ansible_facts['os_family'] == 'Debian'

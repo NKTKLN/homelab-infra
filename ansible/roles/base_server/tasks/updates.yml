@@ -1,16 +1,20 @@
-# Configure unattended upgrades on Debian-based systems and perform a full system upgrade.
 - name: Install unattended-upgrades
-  apt:
+  ansible.builtin.apt:
     name: unattended-upgrades
     state: present
+
 - name: Enable unattended upgrades
-  copy:
+  ansible.builtin.copy:
     dest: /etc/apt/apt.conf.d/20auto-upgrades
+    owner: root
+    group: root
+    mode: "0644"
     content: |
       APT::Periodic::Update-Package-Lists "1";
       APT::Periodic::Unattended-Upgrade "1";
+
 - name: Full upgrade
-  apt:
+  ansible.builtin.apt:
     update_cache: yes
     upgrade: dist
     autoremove: yes

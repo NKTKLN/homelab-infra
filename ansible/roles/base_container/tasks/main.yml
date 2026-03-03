@@ -1,5 +1,7 @@
 - ansible.builtin.import_tasks: ssh.yml
   tags: [ssh]
+  when: base_server_harden_ssh | bool
 
 - ansible.builtin.import_tasks: cleanup.yml
   tags: [cleanup]
+  when: base_container_cleanup_autoremove | bool

@@ -1,58 +1,64 @@
-# Configure a custom MOTD and disable default dynamic MOTD/news mechanisms.
-# Install our custom MOTD script that runs on interactive shell login.
 - name: Install custom MOTD script
-  template:
+  ansible.builtin.template:
     src: motd.sh.j2
     dest: /etc/profile.d/motd.sh
     mode: '0755'
     owner: root
     group: root
-# Disable Ubuntu "motd-news" to avoid noisy update messages.
+
+# Disable Ubuntu motd-news.
 - name: Check if /etc/default/motd-news exists
-  stat:
+  ansible.builtin.stat:
     path: /etc/default/motd-news
   register: motd_news_conf
-- name: Disable motd-news in /etc/default/motd-news
-  replace:
+
+- name: Disable motd-news
+  ansible.builtin.replace:
     path: /etc/default/motd-news
     regexp: '^ENABLED=.*'
     replace: 'ENABLED=0'
   when: motd_news_conf.stat.exists
   notify: stop motd-news
-# Disable dynamic MOTD scripts from /etc/update-motd.d (Ubuntu-specific).
+
+# Disable executable scripts in /etc/update-motd.d (Ubuntu).
 - name: Find dynamic MOTD scripts
-  find:
+  ansible.builtin.find:
     paths: /etc/update-motd.d
     file_type: file
   register: motd_scripts
   ignore_errors: true
+
 - name: Disable dynamic MOTD scripts
-  file:
+  ansible.builtin.file:
     path: "{{ item.path }}"
-    mode: "0644" # Remove executable bit
+    mode: "0644"
   loop: "{{ motd_scripts.files }}"
   when:
     - motd_scripts is defined
     - (motd_scripts.matched | default(0)) > 0
-# Ensure motd-news systemd timer is disabled.
+
+# Disable motd-news systemd timer.
 - name: Check if motd-news.timer exists
-  stat:
+  ansible.builtin.stat:
     path: /lib/systemd/system/motd-news.timer
   register: motd_news_timer
+
 - name: Disable motd-news timer
-  systemd:
+  ansible.builtin.systemd:
     name: motd-news.timer
     state: stopped
     enabled: false
   when: motd_news_timer.stat.exists
-# Disable PAM MOTD hooks so only our custom MOTD is shown.
-- name: Disable pam_motd
-  replace:
+
+# Disable PAM MOTD hooks (only our MOTD remains).
+- name: Disable pam_motd (sshd)
+  ansible.builtin.replace:
     path: /etc/pam.d/sshd
     regexp: '^([^#]*pam_motd\.so.*)$'
     replace: '# \1'
-- name: Disable pam_motd for console login
-  replace:
+
+- name: Disable pam_motd (login)
+  ansible.builtin.replace:
     path: /etc/pam.d/login
     regexp: '^([^#]*pam_motd\.so.*)$'
     replace: '# \1'

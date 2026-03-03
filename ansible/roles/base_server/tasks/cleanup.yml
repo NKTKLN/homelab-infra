@@ -1,5 +1,5 @@
-# Clean up unused packages after changes to keep the system lean.
-- name: Autoremove
-  apt:
-    autoremove: yes
-    purge: yes
+- name: Autoremove unused packages (Debian)
+  ansible.builtin.apt:
+    autoremove: true
+    autoclean: true
+    purge: true
