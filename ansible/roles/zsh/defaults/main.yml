@@ -1,7 +1,4 @@
----
 # Default variables for the zsh role.
 # These values can be overridden in group_vars/host_vars per environment.
-
 username: nktkln
-
 user_home: "/home/{{ username }}"

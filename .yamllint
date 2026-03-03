@@ -1,0 +1,27 @@
+extends: default
+
+rules:
+  new-lines:
+    type: unix
+
+  line-length: disable
+
+  indentation:
+    spaces: 2
+    indent-sequences: consistent
+
+  trailing-spaces: enable
+
+  document-start: disable
+
+  truthy: disable
+
+  comments:
+    min-spaces-from-content: 1
+
+  empty-lines:
+    max: 2
+    max-start: 1
+    max-end: 1
+
+  commas: disable

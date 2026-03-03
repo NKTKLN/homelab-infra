@@ -1,19 +1,15 @@
----
-
 - name: Clone zsh syntax highlighting
   git:
     repo: https://github.com/zsh-users/zsh-syntax-highlighting.git
     dest: "{{ user_home }}/.zsh/zsh-syntax-highlighting"
     depth: 1
     recursive: yes
-
 - name: Clone zsh autosuggestions
   git:
     repo: https://github.com/zsh-users/zsh-autosuggestions
     dest: "{{ user_home }}/.zsh/zsh-autosuggestions"
     depth: 1
     recursive: yes
-
 - name: Clone zsh completions
   git:
     repo: https://github.com/zsh-users/zsh-completions

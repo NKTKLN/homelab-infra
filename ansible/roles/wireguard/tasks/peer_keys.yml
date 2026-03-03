@@ -1,12 +1,9 @@
----
-
 - name: Generate private key for WireGuard Peer
   command: wg genkey
   register: wg_peer_private_key_gen
   args:
     creates: /etc/wireguard/peer/private.key
   run_once: true
-
 - name: Save private key for WireGuard Peer
   copy:
     content: "{{ wg_peer_private_key_gen.stdout }}"
@@ -14,14 +11,12 @@
     mode: '600'
   when: wg_peer_private_key_gen.changed
   run_once: true
-
 - name: Generate public key for WireGuard Peer
   command: /bin/sh -c "echo '{{ wg_peer_private_key_gen.stdout }}' | wg pubkey"
   register: wg_peer_public_key_gen
   args:
     creates: /etc/wireguard/peer/public.key
   run_once: true
-
 - name: Save public key for WireGuard Peer
   copy:
     content: "{{ wg_peer_public_key_gen.stdout }}"
@@ -29,19 +24,16 @@
     mode: '644'
   when: wg_peer_public_key_gen.changed
   run_once: true
-
 - name: Read WireGuard peer private key
   slurp:
     src: /etc/wireguard/peer/private.key
   register: wg_peer_private_key_file
   run_once: true
-
 - name: Read WireGuard peer public key
   slurp:
     src: /etc/wireguard/peer/public.key
   register: wg_peer_public_key_file
   run_once: true
-
 - set_fact:
     wg_peer_private_key: "{{ wg_peer_private_key_file.content | b64decode }}"
     wg_peer_public_key: "{{ wg_peer_public_key_file.content | b64decode }}"

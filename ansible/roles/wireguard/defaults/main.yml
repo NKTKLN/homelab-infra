@@ -1,14 +1,10 @@
----
 # Default variables for the wireguard role.
 # These values can be overridden in group_vars/host_vars per environment.
-
 vpn_interface: wg0
 vpn_port: 51820
 vpn_endpoint: "192.168.1.11"
-
 local_network: "192.168.1.0/24"
 wg_network: "10.10.10.0/24"
 wg_server_ip: "10.10.10.1/24"
 wg_allowed_ip: "10.10.10.10/32"
-
 wg_dns: "1.1.1.1"

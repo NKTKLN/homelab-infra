@@ -1,5 +1,3 @@
----
-
 - name: Configure fail2ban jail
   template:
     src: jail.local.j2

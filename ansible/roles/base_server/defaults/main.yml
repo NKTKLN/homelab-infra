@@ -1,25 +1,17 @@
----
 # Default variables for the base_server role.
 # These values can be overridden in group_vars/host_vars per environment.
-
 perform_dist_upgrade: false
-
 # Enable host firewall (UFW).
 common_firewall_enabled: true
-
 # Enable stricter SSH configuration via template.
 common_harden_ssh: true
-
 # Default SSH user and port for this environment.
 ssh_port: 22
-
 # Ports that will be allowed through UFW (when enabled).
 ufw_allowed_ports_tcp: ["{{ ssh_port }}"]
 ufw_allowed_ports_udp: []
-
 # List of users allowed to log in over SSH.
 ssh_allowed_users: ["{{ ansible_user }}"]
-
 ssh_kex_algorithms: ["curve25519-sha256"]
 ssh_ciphers: ["chacha20-poly1305@openssh.com", "aes256-gcm@openssh.com"]
 ssh_macs: ["hmac-sha2-512", "hmac-sha2-256"]

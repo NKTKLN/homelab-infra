@@ -1,13 +1,9 @@
----
 # Default variables for the base_container role.
 # These values can be overridden in group_vars/host_vars per environment.
-
 # Enable stricter SSH configuration via template.
 common_harden_ssh: true
-
 # Default SSH port for this environment.
 ssh_port: 22
-
 ssh_kex_algorithms: ["curve25519-sha256"]
 ssh_ciphers: ["chacha20-poly1305@openssh.com", "aes256-gcm@openssh.com"]
 ssh_macs: ["hmac-sha2-512", "hmac-sha2-256"]

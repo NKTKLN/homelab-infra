@@ -1,8 +1,6 @@
----
 # Default variables for the fail2ban role.
 # These values can be overridden in group_vars/host_vars per environment.
-
 # Fail2ban parameters for SSH brute-force protection.
-fail2ban_maxretry: 5      # Number of failed attempts before banning
-fail2ban_findtime: 600    # Time window (seconds) for counting failures
-fail2ban_bantime: 3600    # Ban duration in seconds
+fail2ban_maxretry: 5 # Number of failed attempts before banning
+fail2ban_findtime: 600 # Time window (seconds) for counting failures
+fail2ban_bantime: 3600 # Ban duration in seconds

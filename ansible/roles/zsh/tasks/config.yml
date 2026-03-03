@@ -1,5 +1,3 @@
----
-
 - name: Deploy .zshrc
   template:
     src: .zshrc.j2

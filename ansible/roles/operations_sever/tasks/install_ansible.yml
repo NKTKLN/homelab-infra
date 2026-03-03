@@ -1,22 +1,17 @@
----
-
 - name: Install required packages
   apt:
     name: software-properties-common
     state: present
     update_cache: yes
-
 - name: Add Ansible PPA
   apt_repository:
     repo: ppa:ansible/ansible
     state: present
     update_cache: yes
-
 - name: Install Ansible
   apt:
     name: ansible
     state: present
-
 - name: Verify Ansible installation
   command: ansible --version
   register: ansible_version

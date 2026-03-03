@@ -1,17 +1,13 @@
----
-
 - name: Check if virtiofs directory exists
   stat:
     path: "{{ virtiofs_mount_path }}"
   register: mount_dir_info
-
 - name: Configure exports.
   blockinfile:
     path: /etc/exports
     marker: "# {mark} ANSIBLE GENERATED CONFIG BLOCK"
     block: "{{ lookup('template', 'exports.j2') }}"
   when: mount_dir_info.stat.isdir
-
 - name: Re-read NFS exports
   command: exportfs -ra
   notify: restart nfs server

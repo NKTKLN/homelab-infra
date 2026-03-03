@@ -1,6 +1,4 @@
----
 # Configure a custom MOTD and disable default dynamic MOTD/news mechanisms.
-
 # Install our custom MOTD script that runs on interactive shell login.
 - name: Install custom MOTD script
   template:
@@ -9,13 +7,11 @@
     mode: '0755'
     owner: root
     group: root
-
 # Disable Ubuntu "motd-news" to avoid noisy update messages.
 - name: Check if /etc/default/motd-news exists
   stat:
     path: /etc/default/motd-news
   register: motd_news_conf
-
 - name: Disable motd-news in /etc/default/motd-news
   replace:
     path: /etc/default/motd-news
@@ -23,7 +19,6 @@
     replace: 'ENABLED=0'
   when: motd_news_conf.stat.exists
   notify: stop motd-news
-
 # Disable dynamic MOTD scripts from /etc/update-motd.d (Ubuntu-specific).
 - name: Find dynamic MOTD scripts
   find:
@@ -31,36 +26,31 @@
     file_type: file
   register: motd_scripts
   ignore_errors: true
-
 - name: Disable dynamic MOTD scripts
   file:
     path: "{{ item.path }}"
-    mode: "0644"   # Remove executable bit
+    mode: "0644" # Remove executable bit
   loop: "{{ motd_scripts.files }}"
   when:
-  - motd_scripts is defined
-  - (motd_scripts.matched | default(0)) > 0
-
+    - motd_scripts is defined
+    - (motd_scripts.matched | default(0)) > 0
 # Ensure motd-news systemd timer is disabled.
 - name: Check if motd-news.timer exists
   stat:
     path: /lib/systemd/system/motd-news.timer
   register: motd_news_timer
-
 - name: Disable motd-news timer
   systemd:
     name: motd-news.timer
     state: stopped
     enabled: false
   when: motd_news_timer.stat.exists
-
 # Disable PAM MOTD hooks so only our custom MOTD is shown.
 - name: Disable pam_motd
   replace:
     path: /etc/pam.d/sshd
     regexp: '^([^#]*pam_motd\.so.*)$'
     replace: '# \1'
-
 - name: Disable pam_motd for console login
   replace:
     path: /etc/pam.d/login

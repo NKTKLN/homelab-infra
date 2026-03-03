@@ -1,0 +1,13 @@
+formatter:
+  type: basic
+  indent: 2
+  line_ending: lf
+  eof_newline: true
+  include_document_start: false
+  retain_line_breaks: true
+
+exclude:
+  - Taskfile.yml
+  - .pre-commit-config.yaml
+  - .yamllint
+  - .yamlfmt

@@ -1,5 +1,3 @@
----
-
 - name: Set ownership for VirtioFS source directory
   file:
     path: "{{ virtiofs_mount_path }}"

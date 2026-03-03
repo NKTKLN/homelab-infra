@@ -1,6 +1,4 @@
----
 # Handlers for docker role.
-
 - name: start docker
   systemd:
     name: docker

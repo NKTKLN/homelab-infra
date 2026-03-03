@@ -1,10 +1,7 @@
----
-
 - name: Ensure docker group exists
   group:
     name: docker
     state: present
-
 - name: Add current user to docker group
   user:
     name: "{{ ansible_user }}"

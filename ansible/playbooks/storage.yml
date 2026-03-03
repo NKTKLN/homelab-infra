@@ -1,12 +1,9 @@
----
 # Apply configuration to all storage servers.
-
 - name: Setup storage servers
   hosts: storage
   become: true
-
   roles:
-  - { role: common_baseline, tags: ['common_baseline'] }
-  - { role: base_server, tags: ['base_vm'] }
-  - { role: virtiofs, tags: ['virtiofs']}
-  - { role: nfs-server, tags: ['nfs']}
+    - {role: common_baseline, tags: ['common_baseline']}
+    - {role: base_server, tags: ['base_vm']}
+    - {role: virtiofs, tags: ['virtiofs']}
+    - {role: nfs-server, tags: ['nfs']}

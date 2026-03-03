@@ -1,3 +1,2 @@
----
 # Default variables for the docker role.
 # These values can be overridden in group_vars/host_vars per environment.

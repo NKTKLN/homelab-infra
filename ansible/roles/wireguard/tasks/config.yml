@@ -1,18 +1,14 @@
----
-
 - name: Deploy wg0.conf
   template:
     src: wg0.conf.j2
     dest: "/etc/wireguard/{{ vpn_interface }}.conf"
     mode: "0600"
   notify: start wireguard
-
 - name: Deploy peer.conf
   template:
     src: peer.conf.j2
     dest: "/etc/wireguard/peer/{{ vpn_interface }}.conf"
     mode: "0600"
-
 - name: Deploy peer_split_tunnel.conf
   template:
     src: peer_split_tunnel.conf.j2

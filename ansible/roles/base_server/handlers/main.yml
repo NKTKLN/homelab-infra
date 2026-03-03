@@ -1,12 +1,9 @@
----
 # Handlers for base_server role.
-
 - name: restart ssh
   service:
     name: ssh
     state: restarted
     enabled: true
-
 - name: stop motd-news
   service:
     name: motd-news

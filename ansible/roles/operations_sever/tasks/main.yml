@@ -1,26 +1,19 @@
----
 # Main task file for the wireguard role.
 # Includes logically separated task files grouped by feature.
-
 - name: Ensure Debian family
   ansible.builtin.assert:
     that: ansible_facts.os_family == "Debian"
     fail_msg: "This role supports only Debian/Ubuntu."
-
 - include_tasks: setup_proxy.yml
   tags: [proxy]
   when: common_proxy | bool
-
 - include_tasks: install_terraform.yml
   tags: [terraform]
   when: common_proxy == 'terraform'
-
 - include_tasks: install_opentofu.yml
   tags: [opentofu]
   when: common_proxy == 'opentofu'
-
 - include_tasks: install_kubernetes.yml
   tags: [kubernetes]
-
 - include_tasks: ssh.yml
   tags: [ssh]

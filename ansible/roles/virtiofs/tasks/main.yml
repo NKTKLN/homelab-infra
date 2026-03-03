@@ -1,9 +1,6 @@
----
 # Main task file for the virtiofs role.
 # Includes logically separated task files grouped by feature.
-
 - include_tasks: mount.yml
   tags: [mount]
-
 - include_tasks: ownership.yml
   tags: [ownership]

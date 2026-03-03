@@ -1,5 +1,3 @@
----
-
 - name: Enable NAT for WireGuard
   ansible.builtin.iptables:
     table: nat

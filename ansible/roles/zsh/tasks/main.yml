@@ -1,12 +1,8 @@
----
 # Main task file for the zsh role.
 # Includes logically separated task files grouped by feature.
-
 - include_tasks: setup.yml
   tags: [setup]
-
 - include_tasks: plugins.yml
   tags: [plugins]
-
 - include_tasks: config.yml
   tags: [config]

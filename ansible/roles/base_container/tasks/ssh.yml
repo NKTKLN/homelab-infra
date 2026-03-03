@@ -1,6 +1,4 @@
----
 # Harden SSH daemon configuration using a managed template.
-
 - name: Harden SSH configuration
   template:
     src: sshd_config.j2

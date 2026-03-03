@@ -1,12 +1,9 @@
----
 # Apply configuration to all sandbox servers.
-
 - name: Setup sandbox servers
   hosts: sandbox
   become: true
-
   roles:
-  - { role: common_baseline, tags: ['common_baseline'] }
-  - { role: base_server, tags: ['base_vm'] }
-  - { role: zsh, tags: ['zsh'] }
-  - { role: docker, tags: ['docker'] }
+    - {role: common_baseline, tags: ['common_baseline']}
+    - {role: base_server, tags: ['base_vm']}
+    - {role: zsh, tags: ['zsh']}
+    - {role: docker, tags: ['docker']}

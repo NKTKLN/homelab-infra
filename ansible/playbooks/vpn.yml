@@ -1,10 +1,7 @@
----
-
 - name: Configure VPN servers
   hosts: vpn
   become: true
-
   roles:
-  - { role: common_baseline, tags: ['common_baseline'] }
-  - { role: base_container, tags: ['base_container'] }
-  - { role: wireguard, tags: ['vpn'] }
+    - {role: common_baseline, tags: ['common_baseline']}
+    - {role: base_container, tags: ['base_container']}
+    - {role: wireguard, tags: ['vpn']}

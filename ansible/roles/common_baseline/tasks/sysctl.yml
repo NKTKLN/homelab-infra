@@ -1,6 +1,4 @@
----
 # Apply kernel and networking hardening via sysctl(8).
-
 - name: Apply sysctl hardening
   template:
     src: 99-hardening.conf.j2

@@ -1,21 +1,14 @@
----
 # Main task file for the wireguard role.
 # Includes logically separated task files grouped by feature.
-
 - include_tasks: network.yml
   tags: [network]
-
 - include_tasks: setup.yml
   tags: [setup]
-
 - include_tasks: keys.yml
   tags: [keys]
-
 - include_tasks: peer_keys.yml
   tags: [peer_keys]
-
 - include_tasks: config.yml
   tags: [config]
-
 - include_tasks: fetch_config.yml
   tags: [fetch_config]

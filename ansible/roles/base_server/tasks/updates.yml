@@ -1,18 +1,14 @@
----
 # Configure unattended upgrades on Debian-based systems and perform a full system upgrade.
-
 - name: Install unattended-upgrades
   apt:
     name: unattended-upgrades
     state: present
-
 - name: Enable unattended upgrades
   copy:
     dest: /etc/apt/apt.conf.d/20auto-upgrades
     content: |
       APT::Periodic::Update-Package-Lists "1";
       APT::Periodic::Unattended-Upgrade "1";
-
 - name: Full upgrade
   apt:
     update_cache: yes

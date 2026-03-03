@@ -1,35 +1,31 @@
----
 # Default variables for the common_baseline role.
 # These values can be overridden in group_vars/host_vars per environment.
-
 # Common baseline packages installed on all servers.
 common_packages:
-- bc
-- ca-certificates    # Ensure CA certificates are present for HTTPS
-- curl               # HTTP client for scripting/debugging
-- wget               # Alternative HTTP/FTP client
-- unzip              # Unzip utility
-- zip                # Zip archive utility
-- tar                # Tar archive utility
-- vim                # CLI text editor
-- nano               # Simple CLI text editor
-- git                # Version control client
-- jq                 # JSON CLI processor
-- lsof               # List open files/sockets
-- htop               # Interactive process viewer
-- net-tools          # Legacy networking tools (if still needed)
-- traceroute         # Network path diagnostics
-- dnsutils           # DNS tools (dig, nslookup, etc.)
-- python3            # System Python runtime
-- python3-pip        # Python package manager
-- python3-venv       # Virtualenv support for Python 3
-- rsync              # Efficient file sync
-- software-properties-common  # Adds add-apt-repository and helpers
-- acl                # File system ACL support
-
+  - bc
+  - ca-certificates # Ensure CA certificates are present for HTTPS
+  - curl # HTTP client for scripting/debugging
+  - wget # Alternative HTTP/FTP client
+  - unzip # Unzip utility
+  - zip # Zip archive utility
+  - tar # Tar archive utility
+  - vim # CLI text editor
+  - nano # Simple CLI text editor
+  - git # Version control client
+  - jq # JSON CLI processor
+  - lsof # List open files/sockets
+  - htop # Interactive process viewer
+  - net-tools # Legacy networking tools (if still needed)
+  - traceroute # Network path diagnostics
+  - dnsutils # DNS tools (dig, nslookup, etc.)
+  - python3 # System Python runtime
+  - python3-pip # Python package manager
+  - python3-venv # Virtualenv support for Python 3
+  - rsync # Efficient file sync
+  - software-properties-common # Adds add-apt-repository and helpers
+  - acl # File system ACL support
 # Common extra packages installed on all servers.
 common_packages_extra: []
-
 # Kernel/network hardening settings applied via sysctl.
 sysctl_settings:
   net.ipv4.conf.all.rp_filter: 1

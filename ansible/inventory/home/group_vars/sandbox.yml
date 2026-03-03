@@ -1,24 +1,21 @@
----
 # Special parameters for sandbox nodes
-
 # Common extra packages installed on sandbox servers.
 common_packages_extra:
-- gnupg                      # GPG for signing/verifying packages
-- apt-transport-https        # Enables APT to use HTTPS repositories
-- openssh-client             # SSH client for remote access
-- socat                      # Multipurpose relay/networking tool
-- iproute2                   # Modern network configuration tools
-- iputils-ping               # ping and related utilities
-- dnsutils                   # dig, nslookup, and other DNS tools
-- traceroute                 # Network route diagnostics
-- lsof                       # Lists open files and sockets
-- strace                     # System call tracer
-- ncdu                       # Disk usage analyzer
-- yq                         # YAML/YML processor
-- make                       # Build automation tool
-- build-essential            # GCC, g++, make, etc.
-- pkg-config                 # Package configuration helper
-- golang                     # Go programming language
-
+  - gnupg # GPG for signing/verifying packages
+  - apt-transport-https # Enables APT to use HTTPS repositories
+  - openssh-client # SSH client for remote access
+  - socat # Multipurpose relay/networking tool
+  - iproute2 # Modern network configuration tools
+  - iputils-ping # ping and related utilities
+  - dnsutils # dig, nslookup, and other DNS tools
+  - traceroute # Network route diagnostics
+  - lsof # Lists open files and sockets
+  - strace # System call tracer
+  - ncdu # Disk usage analyzer
+  - yq # YAML/YML processor
+  - make # Build automation tool
+  - build-essential # GCC, g++, make, etc.
+  - pkg-config # Package configuration helper
+  - golang # Go programming language
 # Disable host firewall (UFW).
 common_firewall_enabled: false

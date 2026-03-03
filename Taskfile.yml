@@ -7,32 +7,53 @@ env:
 
   TF_PROVIDER: '{{.TF_PROVIDER | default "tofu"}}'
 
+  ANSIBLE_INVENTORY: 'inventory/home/hosts.ini'
+
 tasks:
-  # Commitizen
-  cz-commit:
-    desc: Create a commit using Commitizen (Conventional Commits standard)
+  # ======== Environment ========
+  sync:
+    desc: Sync dependencies (dev group) using uv
     cmds:
-      - cz commit
+      - uv sync
+
+  precommit:
+    desc: Install git hooks
+    deps: [sync]
+    cmds:
+      - uv run pre-commit install
+
+  init:
+    desc: Full project setup
+    deps: [sync, precommit]
+
+  # ======== Commitizen ========
+  cz-commit:
+    desc: Commit using Conventional Commits
+    deps: [sync]
+    cmds:
+      - uv run cz commit
 
   cz-check:
-    desc: Check if commit messages follow Conventional Commits
+    desc: Check commit messages
+    deps: [sync]
     cmds:
-      - cz check
+      - uv run cz check
 
   cz-bump:
-    desc: Bump version, tag, and update changelog using Commitizen
+    desc: Bump version and update changelog
+    deps: [sync]
     cmds:
-      - cz bump
+      - uv run cz bump
 
   release:
-    desc: Bump version and push tags (run after merge to main)
+    desc: Bump version and push tags
+    deps: [cz-bump]
     cmds:
-      - cz bump
       - git push --follow-tags
 
-  # Terraform / OpenTofu
+  # ======== Terraform / OpenTofu ========
   tf-init:
-    desc: Initialize Terraform/OpenTofu in terraform directory
+    desc: Initialize Terraform/OpenTofu
     dir: '{{.TERRAFORM_DIR}}'
     cmds:
       - '{{.TF_PROVIDER}} init'
@@ -44,7 +65,7 @@ tasks:
       - '{{.TF_PROVIDER}} validate'
 
   tf-plan:
-    desc: Show the execution plan
+    desc: Show execution plan
     dir: '{{.TERRAFORM_DIR}}'
     cmds:
       - '{{.TF_PROVIDER}} plan'
@@ -56,7 +77,7 @@ tasks:
       - '{{.TF_PROVIDER}} apply'
 
   tf-destroy:
-    desc: Destroy all managed infrastructure
+    desc: Destroy managed infrastructure
     dir: '{{.TERRAFORM_DIR}}'
     cmds:
       - '{{.TF_PROVIDER}} destroy'
@@ -67,6 +88,12 @@ tasks:
     cmds:
       - '{{.TF_PROVIDER}} fmt -recursive'
 
+  tf-check:
+    desc: Run fmt → validate (quick check)
+    cmds:
+      - task: tf-fmt
+      - task: tf-validate
+
   tf-all:
     desc: Run fmt → init → validate → plan (common workflow)
     cmds:
@@ -75,34 +102,81 @@ tasks:
       - task: tf-validate
       - task: tf-plan
 
-  # Ansible
-  # ansible-lint:
-  #   desc: Run ansible-lint for playbooks
-  #   dir: '{{.ANSIBLE_DIR}}'
-  #   cmds:
-  #     - ansible-lint playbooks/base.yml
+  tf-deploy:
+    desc: Full deploy workflow (init → apply)
+    cmds:
+      - task: tf-init
+      - task: tf-apply
 
-  # ansible-check:
-  #   desc: Check ansible playbooks using --check mode
-  #   dir: '{{.ANSIBLE_DIR}}'
-  #   cmds:
-  #     - ansible-playbook playbooks/base.yml --check
+  # ======== Ansible ========
+  yaml-fmt:
+    desc: Format YAML files (yamlfmt) in Ansible dir
+    dir: '{{.ANSIBLE_DIR}}'
+    cmds:
+      - yamlfmt .
 
-  # ansible-run:
-  #   desc: Apply Ansible configuration
-  #   dir: '{{.ANSIBLE_DIR}}'
-  #   cmds:
-  #     - ansible-playbook -i inventory/hosts.ini playbooks/base.yml
+  yaml-lint:
+    desc: Lint YAML files (yamllint) in Ansible dir
+    deps: [sync]
+    dir: '{{.ANSIBLE_DIR}}'
+    cmds:
+      - uv run yamllint -c ../.yamllint .
 
-  # ansible-ping:
-  #   desc: Ping all hosts from inventory
-  #   dir: '{{.ANSIBLE_DIR}}'
-  #   cmds:
-  #     - ansible all -m ping -i inventory/hosts.ini
+  ansible-lint:
+    desc: Run ansible-lint on playbooks
+    deps: [sync]
+    dir: '{{.ANSIBLE_DIR}}'
+    cmds:
+      - uv run ansible-lint .
 
-  # Scripts
-  refresh-known-hosts:
-    desc: Refresh SSH known_hosts based on Ansible inventory
+  ansible-fmt:
+    desc: Format YAML then run linters (fast)
+    cmds:
+      - task: yaml-fmt
+      - task: ansible-lint
+      - task: yaml-lint
+
+  ansible-checks:
+    desc: YAML lint + ansible-lint + playbook syntax-check
+    deps: [sync]
+    dir: '{{.ANSIBLE_DIR}}'
+    cmds:
+      - uv run yamllint -c ../.yamllint .
+      - uv run ansible-lint .
+      - uv run ansible-playbook -i {{.ANSIBLE_INVENTORY}} playbooks/base.yml --syntax-check
+
+  ansible-ping:
+    desc: Ping all hosts from inventory
+    deps: [sync]
+    dir: '{{.ANSIBLE_DIR}}'
+    cmds:
+      - uv run ansible all -i {{.ANSIBLE_INVENTORY}} -m ping
+
+  ansible-check:
+    desc: Run playbook in check mode (dry-run)
+    deps: [sync]
+    dir: '{{.ANSIBLE_DIR}}'
+    cmds:
+      - uv run ansible-playbook -i {{.ANSIBLE_INVENTORY}} playbooks/base.yml --check
+
+  ansible-run:
+    desc: Apply Ansible configuration
+    deps: [sync]
+    dir: '{{.ANSIBLE_DIR}}'
+    cmds:
+      - uv run ansible-playbook -i {{.ANSIBLE_INVENTORY}} playbooks/base.yml
+
+  ansible-deploy:
+    desc: Lint → check → apply (safe workflow)
+    deps: [sync]
+    cmds:
+      - task: ansible-lint
+      - task: ansible-check
+      - task: ansible-run
+
+  # ======== Scripts ========
+  scripts-refresh-known-hosts:
+    desc: Refresh SSH known_hosts from Ansible inventory
     dir: '{{.SCRIPTS_DIR}}'
     cmds:
       - bash refresh_known_hosts.sh

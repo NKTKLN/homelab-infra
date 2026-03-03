@@ -1,6 +1,4 @@
----
 # Handlers for fail2ban role.
-
 - name: restart fail2ban
   service:
     name: fail2ban

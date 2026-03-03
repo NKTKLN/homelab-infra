@@ -1,5 +1,4 @@
 collections:
-- name: community.general     # Community modules and plugins
-  version: ">=8.0.0"          # Require version 8.0.0 or newer
-
-roles: []                     # No external Galaxy roles required
+  - name: community.general # Community modules and plugins
+    version: ">=8.0.0" # Require version 8.0.0 or newer
+roles: [] # No external Galaxy roles required

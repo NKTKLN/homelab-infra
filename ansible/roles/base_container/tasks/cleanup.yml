@@ -1,6 +1,4 @@
----
 # Clean up unused packages after changes to keep the system lean.
-
 - name: Autoremove
   apt:
     autoremove: yes

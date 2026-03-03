@@ -1,25 +1,18 @@
----
 # Main task file for the base_server role.
 # Includes logically separated task files grouped by feature.
-
 - name: Ensure Debian family
   ansible.builtin.assert:
     that: ansible_facts.os_family == "Debian"
     fail_msg: "This role supports only Debian/Ubuntu."
-
 - include_tasks: updates.yml
   tags: [updates]
-
 - include_tasks: ssh.yml
   tags: [ssh]
   when: common_harden_ssh | bool
-
 - include_tasks: ufw.yml
   tags: [ufw]
   when: common_firewall_enabled | bool
-
 - include_tasks: cleanup.yml
   tags: [cleanup]
-
 - include_tasks: motd.yml
   tags: [motd]

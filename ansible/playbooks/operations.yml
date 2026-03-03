@@ -1,13 +1,10 @@
----
 # Apply configuration to all operations servers.
-
 - name: Setup operations servers
   hosts: operations
   become: true
-
   roles:
-  - { role: common_baseline, tags: ['common_baseline'] }
-  - { role: base_server, tags: ['base_vm'] }
-  - { role: zsh, tags: ['zsh'] }
-  - { role: fail2ban, tags: ['fail2ban'] }
-  - { role: operations_sever, tags: ['operations'] }
+    - {role: common_baseline, tags: ['common_baseline']}
+    - {role: base_server, tags: ['base_vm']}
+    - {role: zsh, tags: ['zsh']}
+    - {role: fail2ban, tags: ['fail2ban']}
+    - {role: operations_sever, tags: ['operations']}
