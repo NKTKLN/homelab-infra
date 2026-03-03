@@ -2,5 +2,4 @@
   ansible.builtin.apt:
     autoremove: true
     autoclean: true
-    purge: true
   when: ansible_facts['os_family'] == 'Debian'

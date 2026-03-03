@@ -1,5 +1,4 @@
-# Install common baseline packages used across all servers.
 - name: Install common packages
-  package:
+  ansible.builtin.package:
     name: "{{ common_packages + (common_packages_extra | default([])) }}"
     state: present
