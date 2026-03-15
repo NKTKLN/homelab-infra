@@ -1,10 +1,24 @@
-# Default variables for the wireguard role.
-# These values can be overridden in group_vars/host_vars per environment.
-vpn_interface: wg0
-vpn_port: 51820
-vpn_endpoint: "192.168.1.11"
-local_network: "192.168.1.0/24"
-wg_network: "10.10.10.0/24"
-wg_server_ip: "10.10.10.1/24"
-wg_allowed_ip: "10.10.10.10/32"
-wg_dns: "1.1.1.1"
+wireguard_interface: wg0
+wireguard_port: 51820
+
+# Set in group_vars/host_vars
+wireguard_endpoint: ""
+
+wireguard_local_network: "192.168.1.0/24"
+wireguard_network: "10.10.10.0/24"
+wireguard_server_address: "10.10.10.1/24"
+wireguard_peer_address: "10.10.10.10/32"
+
+wireguard_dns: "1.1.1.1"
+
+wireguard_config_dir: /etc/wireguard
+wireguard_peer_dir: /etc/wireguard/peer
+
+wireguard_private_key_path: "{{ wireguard_config_dir }}/private.key"
+wireguard_public_key_path: "{{ wireguard_config_dir }}/public.key"
+
+wireguard_peer_private_key_path: "{{ wireguard_peer_dir }}/private.key"
+wireguard_peer_public_key_path: "{{ wireguard_peer_dir }}/public.key"
+
+wireguard_fetch_enabled: false
+wireguard_fetch_dir: "{{ playbook_dir }}/../sensitive/wg_config"

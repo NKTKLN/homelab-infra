@@ -1,6 +1,5 @@
-# Handlers for wireguard role.
-- name: start wireguard
-  systemd:
-    name: "wg-quick@{{ vpn_interface }}"
-    state: started
+- name: restart wireguard
+  ansible.builtin.systemd:
+    name: "wg-quick@{{ wireguard_interface }}"
+    state: restarted
     enabled: true

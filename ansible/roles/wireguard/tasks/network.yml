@@ -1,7 +1,0 @@
-- name: Enable NAT for WireGuard
-  ansible.builtin.iptables:
-    table: nat
-    chain: POSTROUTING
-    jump: MASQUERADE
-    out_interface: "{{ ansible_facts['default_ipv4']['interface'] }}"
-  become: true

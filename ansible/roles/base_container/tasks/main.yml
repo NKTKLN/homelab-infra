@@ -1,6 +1,14 @@
+- name: Ensure Debian family
+  ansible.builtin.assert:
+    that: ansible_facts.os_family == "Debian"
+    fail_msg: "This role supports only Debian/Ubuntu."
+
+- ansible.builtin.import_tasks: updates.yml
+  tags: [updates]
+
 - ansible.builtin.import_tasks: ssh.yml
   tags: [ssh]
-  when: base_server_harden_ssh | bool
+  when: base_container_harden_ssh | bool
 
 - ansible.builtin.import_tasks: cleanup.yml
   tags: [cleanup]

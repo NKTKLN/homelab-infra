@@ -1,14 +1,38 @@
-# Main task file for the wireguard role.
-# Includes logically separated task files grouped by feature.
-- include_tasks: network.yml
-  tags: [network]
-- include_tasks: setup.yml
-  tags: [setup]
-- include_tasks: keys.yml
-  tags: [keys]
-- include_tasks: peer_keys.yml
-  tags: [peer_keys]
-- include_tasks: config.yml
-  tags: [config]
-- include_tasks: fetch_config.yml
-  tags: [fetch_config]
+- name: Ensure Debian family
+  ansible.builtin.assert:
+    that: ansible_facts.os_family == "Debian"
+    fail_msg: "This role supports only Debian/Ubuntu."
+
+
+- name: Install and prepare WireGuard
+  ansible.builtin.import_tasks: install.yml
+  tags: [vpn, install]
+
+- name: Generate server keys
+  ansible.builtin.import_tasks: generate_keypair.yml
+  vars:
+    wireguard_key_dir: "{{ wireguard_config_dir }}"
+    wireguard_private_key_dest: "{{ wireguard_private_key_path }}"
+    wireguard_public_key_dest: "{{ wireguard_public_key_path }}"
+    wireguard_private_key_fact: wireguard_private_key
+    wireguard_public_key_fact: wireguard_public_key
+  tags: [vpn, keys]
+
+- name: Generate peer keys
+  ansible.builtin.import_tasks: generate_keypair.yml
+  vars:
+    wireguard_key_dir: "{{ wireguard_peer_dir }}"
+    wireguard_private_key_dest: "{{ wireguard_peer_private_key_path }}"
+    wireguard_public_key_dest: "{{ wireguard_peer_public_key_path }}"
+    wireguard_private_key_fact: wireguard_peer_private_key
+    wireguard_public_key_fact: wireguard_peer_public_key
+  tags: [vpn, peer_keys]
+
+- name: Deploy WireGuard configs
+  ansible.builtin.import_tasks: config.yml
+  tags: [vpn, config]
+
+- name: Fetch peer configs
+  ansible.builtin.import_tasks: fetch_config.yml
+  when: wireguard_fetch_enabled | bool
+  tags: [vpn, fetch_config]

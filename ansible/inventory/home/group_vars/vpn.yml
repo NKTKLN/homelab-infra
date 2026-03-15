@@ -1,3 +1,11 @@
 # Required for routing/VPN functionality
 sysctl_settings:
   net.ipv4.ip_forward: 1
+
+wireguard_endpoint: "192.168.1.11"
+wireguard_local_network: "192.168.1.0/24"
+wireguard_network: "10.10.10.0/24"
+wireguard_server_address: "10.10.10.1/24"
+wireguard_peer_address: "10.10.10.10/32"
+wireguard_dns: "1.1.1.1"
+wireguard_fetch_enabled: true

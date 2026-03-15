@@ -1,10 +1,13 @@
+# APT
+perform_dist_upgrade: false # full dist-upgrade (use with care)
+
 # Cleanup
 base_container_cleanup_autoremove: true # Debian autoremove/purge (can remove dependencies)
 
 # SSH hardening
 base_container_harden_ssh: true # manage sshd_config from template
 ssh_port: 22
-ssh_permit_root_login: "no" # or "prohibit-password"
+ssh_permit_root_login: "yes" # or "prohibit-password"
 ssh_password_authentication: "no" # keys only
 ssh_pubkey_authentication: "yes"
 ssh_challenge_response_authentication: "no"

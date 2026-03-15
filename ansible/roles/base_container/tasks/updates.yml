@@ -8,8 +8,3 @@
     upgrade: true
     autoremove: true
   when: perform_dist_upgrade | bool
-
-- name: Install common packages
-  ansible.builtin.package:
-    name: "{{ common_packages + (common_packages_extra | default([])) }}"
-    state: present

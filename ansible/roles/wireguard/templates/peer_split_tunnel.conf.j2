@@ -1,9 +1,9 @@
 [Interface]
-PrivateKey = {{ wg_peer_private_key }}
-Address = {{ wg_allowed_ip }}
+PrivateKey = {{ wireguard_peer_private_key }}
+Address = {{ wireguard_peer_address }}
 
 [Peer]
-PublicKey = {{ wg_public_key }}
-Endpoint = {{ vpn_endpoint }}:{{ vpn_port }}
-AllowedIPs = {{ local_network }}, {{ wg_network }}
+PublicKey = {{ wireguard_public_key }}
+Endpoint = {{ wireguard_endpoint }}:{{ wireguard_port }}
+AllowedIPs = {{ wireguard_local_network }}, {{ wireguard_network }}
 PersistentKeepalive = 25

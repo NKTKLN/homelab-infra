@@ -1,0 +1,44 @@
+- name: Generate WireGuard private key
+  ansible.builtin.command: wg genkey
+  register: wireguard_private_key_gen
+  args:
+    creates: "{{ wireguard_private_key_dest }}"
+
+- name: Save WireGuard private key
+  ansible.builtin.copy:
+    content: "{{ wireguard_private_key_gen.stdout }}"
+    dest: "{{ wireguard_private_key_dest }}"
+    owner: root
+    group: root
+    mode: "0600"
+  when: wireguard_private_key_gen.changed
+
+- name: Generate WireGuard public key
+  ansible.builtin.shell: "wg pubkey < {{ wireguard_private_key_dest }}"
+  register: wireguard_public_key_gen
+  args:
+    creates: "{{ wireguard_public_key_dest }}"
+
+- name: Save WireGuard public key
+  ansible.builtin.copy:
+    content: "{{ wireguard_public_key_gen.stdout }}"
+    dest: "{{ wireguard_public_key_dest }}"
+    owner: root
+    group: root
+    mode: "0644"
+  when: wireguard_public_key_gen.changed
+
+- name: Read WireGuard private key
+  ansible.builtin.slurp:
+    src: "{{ wireguard_private_key_dest }}"
+  register: wireguard_private_key_file
+
+- name: Read WireGuard public key
+  ansible.builtin.slurp:
+    src: "{{ wireguard_public_key_dest }}"
+  register: wireguard_public_key_file
+
+- name: Set WireGuard key facts
+  ansible.builtin.set_fact:
+    "{{ wireguard_private_key_fact }}": "{{ wireguard_private_key_file.content | b64decode | trim }}"
+    "{{ wireguard_public_key_fact }}": "{{ wireguard_public_key_file.content | b64decode | trim }}"

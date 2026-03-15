@@ -1,12 +1,21 @@
-- name: Find all peer config files
-  find:
-    paths: /etc/wireguard/peer
+- name: Find peer config files
+  ansible.builtin.find:
+    paths: "{{ wireguard_peer_dir }}"
     file_type: file
     patterns: "*.conf"
-  register: peer_config_files
-- name: Fetch peer config file
-  fetch:
+  register: wireguard_peer_config_files
+
+- name: Ensure local fetch directory exists
+  ansible.builtin.file:
+    path: "{{ wireguard_fetch_dir }}"
+    state: directory
+    mode: "0700"
+  delegate_to: localhost
+  become: false
+
+- name: Fetch peer config files
+  ansible.builtin.fetch:
     src: "{{ item.path }}"
-    dest: ../../sensitive/wg_config/
-    flat: yes
-  loop: "{{ peer_config_files.files }}"
+    dest: "{{ wireguard_fetch_dir }}/"
+    flat: true
+  loop: "{{ wireguard_peer_config_files.files }}"

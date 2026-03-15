@@ -1,10 +1,10 @@
 [Interface]
-PrivateKey = {{ wg_peer_private_key }}
-Address = {{ wg_allowed_ip }}
-DNS = {{ wg_dns }}
+PrivateKey = {{ wireguard_peer_private_key }}
+Address = {{ wireguard_peer_address }}
+DNS = {{ wireguard_dns }}
 
 [Peer]
-PublicKey = {{ wg_public_key }}
-Endpoint = {{ vpn_endpoint }}:{{ vpn_port }}
+PublicKey = {{ wireguard_public_key }}
+Endpoint = {{ wireguard_endpoint }}:{{ wireguard_port }}
 AllowedIPs = 0.0.0.0/0, ::/0
 PersistentKeepalive = 25

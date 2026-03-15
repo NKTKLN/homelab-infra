@@ -1,3 +1,6 @@
+# APT
+perform_dist_upgrade: false # full dist-upgrade (use with care)
+
 common_packages:
   - bc
   - ca-certificates
