@@ -1,53 +1,101 @@
 - name: Baseline for all VMs
   hosts: vms
   become: true
-  roles:
-    - role: common_baseline
+  tasks:
+    - name: Apply common_baseline role
+      ansible.builtin.import_role:
+        name: common_baseline
       tags: [baseline]
-    - role: base_server
+
+    - name: Apply base_server role
+      ansible.builtin.import_role:
+        name: base_server
       tags: [base]
 
 - name: Baseline for all containers
   hosts: containers
   become: true
-  roles:
-    - role: common_baseline
+  tasks:
+    - name: Apply common_baseline role
+      ansible.builtin.import_role:
+        name: common_baseline
       tags: [baseline]
-    - role: base_container
+
+    - name: Apply base_container role
+      ansible.builtin.import_role:
+        name: base_container
       tags: [base]
 
 - name: Operations servers
   hosts: operations
   become: true
-  roles:
-    - role: zsh
+  tasks:
+    - name: Apply zsh role
+      ansible.builtin.import_role:
+        name: zsh
       tags: [shell]
-    - role: fail2ban
+
+    - name: Apply fail2ban role
+      ansible.builtin.import_role:
+        name: fail2ban
       tags: [security]
-    - role: operations_sever
-      tags: [operations]
+
+    - name: Apply proxy_client role
+      ansible.builtin.import_role:
+        name: proxy_client
+      tags: [proxy]
+
+    - name: Flush handlers after proxy setup
+      ansible.builtin.meta: flush_handlers
+
+    - name: Apply iac_tools role
+      ansible.builtin.import_role:
+        name: iac_tools
+      tags: [iac]
+
+    - name: Apply kubernetes_tools role
+      ansible.builtin.import_role:
+        name: kubernetes_tools
+      tags: [kube]
+
+    - name: Apply ssh_trust role
+      ansible.builtin.import_role:
+        name: ssh_trust
+      tags: [ssh]
 
 - name: Sandbox servers
   hosts: sandbox
   become: true
-  roles:
-    - role: zsh
+  tasks:
+    - name: Apply zsh role
+      ansible.builtin.import_role:
+        name: zsh
       tags: [shell]
-    - role: docker
+
+    - name: Apply docker role
+      ansible.builtin.import_role:
+        name: docker
       tags: [docker]
 
 - name: Storage servers
   hosts: storage
   become: true
-  roles:
-    - role: virtiofs
+  tasks:
+    - name: Apply virtiofs role
+      ansible.builtin.import_role:
+        name: virtiofs
       tags: [storage]
-    - role: nfs-server
+
+    - name: Apply nfs-server role
+      ansible.builtin.import_role:
+        name: nfs-server
       tags: [storage, nfs]
 
 - name: VPN servers
   hosts: vpn
   become: true
-  roles:
-    - role: wireguard
+  tasks:
+    - name: Apply wireguard role
+      ansible.builtin.import_role:
+        name: wireguard
       tags: [vpn]

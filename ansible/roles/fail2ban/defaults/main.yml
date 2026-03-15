@@ -1,4 +1,5 @@
 # Fail2ban (SSH jail)
+ssh_port: 22
 fail2ban_sshd_enabled: true # enable SSH jail
 fail2ban_sshd_maxretry: 5 # failed attempts before ban
 fail2ban_sshd_findtime: 600 # time window for counting failures (seconds)

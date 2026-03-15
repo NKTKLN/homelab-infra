@@ -1,0 +1,9 @@
+{% for host in groups['all'] %}
+{% if hostvars[host]['ansible_host'] is defined %}
+Host {{ host }}
+  HostName {{ hostvars[host]['ansible_host'] }}
+  Port {{ hostvars[host]['ansible_port'] | default(22) }}
+  User {{ hostvars[host]['ansible_user'] | default(ssh_trust_user) }}
+
+{% endif %}
+{% endfor %}

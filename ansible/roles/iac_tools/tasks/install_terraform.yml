@@ -1,0 +1,72 @@
+- name: Ensure apt keyrings directory exists
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: "0755"
+
+- name: Download HashiCorp GPG key
+  ansible.builtin.get_url:
+    url: https://apt.releases.hashicorp.com/gpg
+    dest: /etc/apt/keyrings/hashicorp.asc
+    mode: "0644"
+    timeout: 60
+  environment: >-
+    {{
+      {
+        'http_proxy': proxy_http_url,
+        'https_proxy': proxy_http_url,
+        'HTTP_PROXY': proxy_http_url,
+        'HTTPS_PROXY': proxy_http_url,
+        'no_proxy': proxy_no_proxy,
+        'NO_PROXY': proxy_no_proxy
+      } if terraform_use_proxy | bool else {}
+    }}
+  register: terraform_key_download
+  retries: 3
+  delay: 5
+  until: terraform_key_download is succeeded
+
+
+- name: Dearmor HashiCorp GPG key
+  ansible.builtin.command: >
+    gpg --dearmor -o /etc/apt/keyrings/hashicorp.gpg /etc/apt/keyrings/hashicorp.asc
+  args:
+    creates: /etc/apt/keyrings/hashicorp.gpg
+
+
+- name: Add HashiCorp repository
+  ansible.builtin.apt_repository:
+    repo: >-
+      deb [signed-by=/etc/apt/keyrings/hashicorp.gpg] https://apt.releases.hashicorp.com {{ ansible_facts['distribution_release'] }} main
+    filename: hashicorp
+    state: present
+    update_cache: false
+  environment: >-
+    {{
+      {
+        'http_proxy': proxy_http_url,
+        'https_proxy': proxy_http_url,
+        'HTTP_PROXY': proxy_http_url,
+        'HTTPS_PROXY': proxy_http_url,
+        'no_proxy': proxy_no_proxy,
+        'NO_PROXY': proxy_no_proxy
+      } if terraform_use_proxy | bool else {}
+    }}
+
+
+- name: Install Terraform
+  ansible.builtin.apt:
+    name: terraform
+    state: present
+    update_cache: true
+  environment: >-
+    {{
+      {
+        'http_proxy': proxy_http_url,
+        'https_proxy': proxy_http_url,
+        'HTTP_PROXY': proxy_http_url,
+        'HTTPS_PROXY': proxy_http_url,
+        'no_proxy': proxy_no_proxy,
+        'NO_PROXY': proxy_no_proxy
+      } if terraform_use_proxy | bool else {}
+    }}

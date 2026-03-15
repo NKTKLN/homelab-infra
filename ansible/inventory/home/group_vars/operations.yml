@@ -9,8 +9,4 @@ common_packages_extra:
   - lsof
   - tree
   - yq
-
-# Ports allowed by UFW when the firewall is enabled.
-# SSH port is configurable via `ssh_port`.
-ufw_allowed_ports:
-  - "{{ ssh_port }}"
+  - nvim

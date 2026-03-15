@@ -1,0 +1,19 @@
+- name: Ensure Ansible PPA prerequisites are installed
+  ansible.builtin.apt:
+    name: software-properties-common
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Add Ansible PPA
+  ansible.builtin.apt_repository:
+    repo: ppa:ansible/ansible
+    state: present
+    update_cache: true
+
+- name: Install Ansible
+  ansible.builtin.apt:
+    name: ansible
+    state: present
+    update_cache: true
+    cache_valid_time: 3600

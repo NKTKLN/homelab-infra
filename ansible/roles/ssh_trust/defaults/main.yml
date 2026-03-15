@@ -1,0 +1,5 @@
+# SSH trust
+ssh_trust_enabled: true
+ssh_trust_user: "{{ ansible_user }}"
+ssh_key_type: ed25519
+ssh_private_key_path: "/home/{{ ssh_trust_user }}/.ssh/id_ed25519"

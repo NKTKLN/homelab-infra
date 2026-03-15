@@ -1,0 +1,42 @@
+proxy() {
+  local proxy_env_source="/etc/profile.d/proxy.env.sh"
+
+  case "${1:-}" in
+    on)
+      if [[ ! -f "${proxy_env_source}" ]]; then
+        echo "Error: ${proxy_env_source} not found"
+        return 1
+      fi
+
+      # shellcheck disable=SC1090
+      source "${proxy_env_source}"
+      echo "Proxy enabled in current shell session"
+      ;;
+    off)
+      unset http_proxy https_proxy HTTP_PROXY HTTPS_PROXY no_proxy NO_PROXY
+      echo "Proxy disabled in current shell session"
+      ;;
+    status)
+      if [[ -n "${http_proxy:-}" || -n "${HTTP_PROXY:-}" || -n "${https_proxy:-}" || -n "${HTTPS_PROXY:-}" ]]; then
+        echo "Proxy: enabled in current shell session"
+        env | grep -E '^(http_proxy|https_proxy|HTTP_PROXY|HTTPS_PROXY|no_proxy|NO_PROXY)=' | sort
+      else
+        echo "Proxy: disabled in current shell session"
+      fi
+      ;;
+    help|-h|--help|"")
+      cat <<'EOF'
+Usage:
+  proxy on
+  proxy off
+  proxy status
+EOF
+      ;;
+    *)
+      echo "Unknown command: $1"
+      echo
+      echo "Usage: proxy {on|off|status}"
+      return 1
+      ;;
+  esac
+}

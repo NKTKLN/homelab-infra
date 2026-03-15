@@ -1,0 +1,9 @@
+# Proxy
+proxy_http_port: 3128
+
+shadowsocks_server: ""
+shadowsocks_server_port: 8388
+shadowsocks_password: ""
+shadowsocks_method: "aes-256-gcm"
+shadowsocks_local_address: "127.0.0.1"
+shadowsocks_local_port: 1080

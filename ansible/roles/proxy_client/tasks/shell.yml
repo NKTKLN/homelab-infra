@@ -1,0 +1,27 @@
+- name: Install proxy environment file
+  ansible.builtin.template:
+    src: environment.j2
+    dest: /etc/profile.d/proxy.env.sh
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Install proxy env template
+  ansible.builtin.template:
+    src: proxy-shell.sh.j2
+    dest: /usr/local/share/proxy-shell.sh
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Check if zsh is installed
+  ansible.builtin.stat:
+    path: /usr/bin/zsh
+  register: zsh_binary
+
+- name: Load proxy shell function in zshrc
+  ansible.builtin.lineinfile:
+    path: "/home/{{ zsh_user }}/.zshrc"
+    line: '[ -f /usr/local/share/proxy-shell.sh ] && source /usr/local/share/proxy-shell.sh'
+    state: present
+  when: zsh_binary.stat.exists
