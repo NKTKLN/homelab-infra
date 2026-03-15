@@ -1,12 +1,9 @@
-- name: Update apt cache
-  ansible.builtin.apt:
-    update_cache: true
-    cache_valid_time: 3600
-
 - name: Install wireguard
   ansible.builtin.apt:
     name: wireguard
     state: present
+    update_cache: true
+    cache_valid_time: 3600
 
 - name: Create WireGuard config directory
   ansible.builtin.file:
