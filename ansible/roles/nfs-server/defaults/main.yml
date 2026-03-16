@@ -1,8 +1,20 @@
 # Storage mount
 virtiofs_mount_path: "/mnt/hard-drive" # mount point used for exports
 
+# Ownership for mountpoint directories
+nfs_exports_owner: "{{ ansible_user }}"
+nfs_exports_group: "{{ ansible_user }}"
+nfs_exports_mode: "0755"
+nfs_exports_recursive: false
+
 # NFS exports
 nfs_exports:
-  - path: "{{ virtiofs_mount_path }}"
-    clients: "192.168.1.0/24" # allowed network (CIDR)
-    options: "rw,sync,no_subtree_check" # export options
+  - name: "docker"
+    path: "{{ virtiofs_mount_path }}/nfs/docker"
+    clients: "192.168.1.0/24"
+    options: "rw,sync,no_subtree_check,fsid=1"
+
+  - name: "k8s"
+    path: "{{ virtiofs_mount_path }}/nfs/k8s"
+    clients: "192.168.1.0/24"
+    options: "rw,sync,no_subtree_check,fsid=2"

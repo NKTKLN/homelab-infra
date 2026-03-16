@@ -1,0 +1,2 @@
+ufw_allowed_ports_tcp: [2049, 111]
+ufw_allowed_ports_udp: [111]

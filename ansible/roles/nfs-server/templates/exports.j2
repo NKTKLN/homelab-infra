@@ -1,3 +1,1 @@
-{% for e in nfs_exports %}
-{{ e.path }} {{ e.clients }}({{ e.options }})
-{% endfor %}
+{{ export.path }} {{ export.clients }}({{ export.options }})

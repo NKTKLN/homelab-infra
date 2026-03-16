@@ -1,9 +1,0 @@
-# IaC tooling
-iac_provider: "terraform" # terraform | opentofu
-
-# Proxy
-proxy_http_url: "http://127.0.0.1:3128"
-proxy_no_proxy: "127.0.0.1,localhost"
-
-terraform_use_proxy: true
-opentofu_use_proxy: true

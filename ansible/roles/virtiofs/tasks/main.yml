@@ -1,6 +1,5 @@
-# Main task file for the virtiofs role.
-# Includes logically separated task files grouped by feature.
-- include_tasks: mount.yml
-  tags: [mount]
-- include_tasks: ownership.yml
-  tags: [ownership]
+- ansible.builtin.import_tasks: mount.yml
+  tags: [virtiofs, mount]
+
+- ansible.builtin.import_tasks: ownership.yml
+  tags: [virtiofs, ownership]

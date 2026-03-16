@@ -1,9 +1,0 @@
-- name: restart ss
-  ansible.builtin.service:
-    name: shadowsocks-libev-local@client
-    state: restarted
-
-- name: restart privoxy
-  ansible.builtin.service:
-    name: privoxy
-    state: restarted

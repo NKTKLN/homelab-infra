@@ -1,4 +1,9 @@
-# Default variables for the virtiofs role.
-# These values can be overridden in group_vars/host_vars per environment.
 virtiofs_mount_path: "/mnt/hard-drive"
-virtiofs_source: "Hard-Drive"
+virtiofs_source: "storage-node-hard-drive"
+virtiofs_mount_opts: "defaults"
+
+# Ownership for mountpoint directory (not recursive by default)
+virtiofs_owner: "{{ ansible_user }}"
+virtiofs_group: "{{ ansible_user }}"
+virtiofs_mode: "0755"
+virtiofs_recursive: false

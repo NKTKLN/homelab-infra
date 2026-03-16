@@ -1,11 +1,15 @@
 - name: Ensure mount point exists
-  file:
+  ansible.builtin.file:
     path: "{{ virtiofs_mount_path }}"
     state: directory
-- name: Mount virtiofs share with automount
-  mount:
+    owner: "{{ virtiofs_owner }}"
+    group: "{{ virtiofs_group }}"
+    mode: "{{ virtiofs_mode }}"
+
+- name: Mount virtiofs share (persist in fstab)
+  ansible.builtin.mount:
     path: "{{ virtiofs_mount_path }}"
     src: "{{ virtiofs_source }}"
     fstype: virtiofs
-    opts: defaults
+    opts: "{{ virtiofs_mount_opts }}"
     state: mounted

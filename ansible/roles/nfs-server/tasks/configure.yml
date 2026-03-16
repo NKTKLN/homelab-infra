@@ -14,11 +14,23 @@
     group: root
     mode: "0755"
 
-- name: Configure NFS exports (role-managed)
+- name: Ensure NFS export directories exist
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: "{{ nfs_exports_owner }}"
+    group: "{{ nfs_exports_group }}"
+    mode: "{{ nfs_exports_mode }}"
+  loop: "{{ nfs_exports }}"
+
+- name: Configure NFS exports
   ansible.builtin.template:
     src: exports.j2
-    dest: /etc/exports.d/virtiofs.exports
+    dest: /etc/exports.d/{{ export.name }}.exports
     owner: root
     group: root
     mode: "0644"
+  loop: "{{ nfs_exports }}"
+  loop_control:
+    loop_var: export
   notify: reload nfs exports

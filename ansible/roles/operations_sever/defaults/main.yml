@@ -1,7 +1,0 @@
-# Default variables for the operations_server role.
-# These values can be overridden in group_vars/host_vars per environment.
-common_proxy: true
-ss_proxy_url: "138.124.113.100"
-ss_proxy_port: 8388
-ss_proxy_password: ""
-terraform_provider: "opentofu"
