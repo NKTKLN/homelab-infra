@@ -21,4 +21,4 @@ wireguard_peer_private_key_path: "{{ wireguard_peer_dir }}/private.key"
 wireguard_peer_public_key_path: "{{ wireguard_peer_dir }}/public.key"
 
 wireguard_fetch_enabled: false
-wireguard_fetch_dir: "{{ playbook_dir }}/../sensitive/wg_config"
+wireguard_fetch_dir: "{{ playbook_dir }}/../../../sensitive/wg_config"

@@ -1,5 +1,4 @@
 # Additional packages for sandbox nodes.
-# Intended for debugging, networking, and local builds.
 common_packages_extra:
   - gnupg
   - apt-transport-https

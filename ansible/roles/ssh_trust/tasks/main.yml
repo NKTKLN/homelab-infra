@@ -6,29 +6,31 @@
     group: "{{ ssh_trust_user }}"
     mode: "0700"
 
-- name: Create SSH keypair
+- name: Create SSH keypair on op-node
   community.crypto.openssh_keypair:
     path: "{{ ssh_private_key_path }}"
     type: "{{ ssh_key_type }}"
     owner: "{{ ssh_trust_user }}"
     group: "{{ ssh_trust_user }}"
     mode: "0600"
+  when: inventory_hostname == groups['operations'][0]
 
-- name: Read public key
+- name: Read op-node public key
   ansible.builtin.slurp:
     src: "{{ ssh_private_key_path }}.pub"
   register: ops_pub_file
+  when: inventory_hostname == groups['operations'][0]
 
-- name: Set public key fact
+- name: Save op-node public key as fact
   ansible.builtin.set_fact:
     ops_pub: "{{ ops_pub_file.content | b64decode | trim }}"
+  when: inventory_hostname == groups['operations'][0]
 
-- name: Install authorized keys from all nodes
+- name: Add op-node key to authorized_keys on all hosts
   ansible.posix.authorized_key:
     user: "{{ ssh_trust_user }}"
-    key: "{{ hostvars[item]['ops_pub'] }}"
-  loop: "{{ groups['all'] }}"
-  when: hostvars[item]['ops_pub'] is defined
+    key: "{{ hostvars[groups['operations'][0]].ops_pub }}"
+    state: present
 
 - name: Generate SSH config with hosts from inventory
   ansible.builtin.template:

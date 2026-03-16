@@ -1,0 +1,9 @@
+# Docker context
+docker_user: "{{ ansible_user }}"
+docker_context_target_host: vm-docker-worker
+docker_context_name: homelab-docker-worker
+docker_context_user: "{{ hostvars[docker_context_target_host]['ansible_user'] }}"
+docker_context_host: "{{ hostvars[docker_context_target_host]['ansible_host'] }}"
+docker_context_port: "{{ hostvars[docker_context_target_host]['ansible_port'] | default(22) }}"
+docker_context_endpoint: >-
+  ssh://{{ docker_context_user }}@{{ docker_context_host }}:{{ docker_context_port }}

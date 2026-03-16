@@ -1,0 +1,29 @@
+- name: Check existing Docker contexts
+  ansible.builtin.command: docker context ls --format '{{"{{.Name}}"}}'
+  register: docker_contexts
+  changed_when: false
+  become: true
+  become_user: "{{ docker_user }}"
+
+- name: Create Docker context for worker
+  ansible.builtin.command:
+    argv:
+      - docker
+      - context
+      - create
+      - "{{ docker_context_name }}"
+      - --docker
+      - "host={{ docker_context_endpoint }}"
+  when: docker_context_name not in docker_contexts.stdout_lines
+  become: true
+  become_user: "{{ docker_user }}"
+
+- name: Apply Docker context for worker
+  ansible.builtin.command:
+    argv:
+      - docker
+      - context
+      - use
+      - "{{ docker_context_name }}"
+  become: true
+  become_user: "{{ docker_user }}"

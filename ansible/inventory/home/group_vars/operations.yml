@@ -1,5 +1,4 @@
 # Additional packages for operations nodes.
-# Focused on maintenance and basic troubleshooting.
 common_packages_extra:
   - gnupg
   - apt-transport-https
@@ -9,4 +8,4 @@ common_packages_extra:
   - lsof
   - tree
   - yq
-  - nvim
+  - neovim

@@ -28,6 +28,7 @@ exclude_paths = [
   ".cache",
   "terraform",
   ".pre-commit-config.yaml",
+  ".yamlfmt",
   ".yamllint",
 ]
 

@@ -16,21 +16,6 @@
     dest: /etc/apt/keyrings/kubernetes.asc
     mode: "0644"
     timeout: 60
-  environment: >-
-    {{
-      {
-        'http_proxy': proxy_http_url,
-        'https_proxy': proxy_http_url,
-        'HTTP_PROXY': proxy_http_url,
-        'HTTPS_PROXY': proxy_http_url,
-        'no_proxy': proxy_no_proxy,
-        'NO_PROXY': proxy_no_proxy
-      } if kubernetes_use_proxy | bool else {}
-    }}
-  register: kubernetes_key_download
-  retries: 3
-  delay: 5
-  until: kubernetes_key_download is succeeded
 
 - name: Dearmor Kubernetes GPG key
   ansible.builtin.command: >
@@ -45,17 +30,6 @@
     filename: kubernetes
     state: present
     update_cache: false
-  environment: >-
-    {{
-      {
-        'http_proxy': proxy_http_url,
-        'https_proxy': proxy_http_url,
-        'HTTP_PROXY': proxy_http_url,
-        'HTTPS_PROXY': proxy_http_url,
-        'no_proxy': proxy_no_proxy,
-        'NO_PROXY': proxy_no_proxy
-      } if kubernetes_use_proxy | bool else {}
-    }}
 
 - name: Install Kubernetes packages
   ansible.builtin.apt:
@@ -65,17 +39,6 @@
       - kubectl
     state: present
     update_cache: true
-  environment: >-
-    {{
-      {
-        'http_proxy': proxy_http_url,
-        'https_proxy': proxy_http_url,
-        'HTTP_PROXY': proxy_http_url,
-        'HTTPS_PROXY': proxy_http_url,
-        'no_proxy': proxy_no_proxy,
-        'NO_PROXY': proxy_no_proxy
-      } if kubernetes_use_proxy | bool else {}
-    }}
 
 - name: Ensure kubelet is enabled and running
   ansible.builtin.service:
