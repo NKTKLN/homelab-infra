@@ -44,28 +44,8 @@ locals {
       ipaddr          = "192.168.1.13/24"
       virtiofs        = []
       pci_devices     = []
-      firewall_enable = true
-      firewall_rules = [
-        {
-          action  = "ACCEPT"
-          type    = "in"
-          proto   = "tcp"
-          dport   = "22"
-          comment = "Allow SSH"
-        },
-        {
-          action  = "ACCEPT"
-          type    = "in"
-          proto   = "tcp"
-          dport   = "9100"
-          comment = "Allow Node Exporter"
-        },
-        {
-          action  = "DROP"
-          type    = "in"
-          comment = "Drop all other incoming traffic"
-        }
-      ]
+      firewall_enable = false
+      firewall_rules = []
     }
 
     "vm-storage-node" = {
@@ -83,7 +63,7 @@ locals {
     "vm-k8s-master-1" = {
       hostname        = "vm-k8s-master-1"
       cores           = 4
-      memory          = 6144
+      memory          = 4096
       disk_size       = 40
       ipaddr          = "192.168.1.15/24"
       virtiofs        = []
@@ -107,7 +87,7 @@ locals {
     "vm-k8s-gpu-worker-1" = {
       hostname        = "vm-k8s-gpu-worker-1"
       cores           = 4
-      memory          = 8192
+      memory          = 6144
       disk_size       = 60
       ipaddr          = "192.168.1.17/24"
       virtiofs        = []
@@ -119,7 +99,7 @@ locals {
     "vm-docker-worker" = {
       hostname        = "vm-docker-worker"
       cores           = 4
-      memory          = 6144
+      memory          = 4096
       disk_size       = 40
       ipaddr          = "192.168.1.18/24"
       virtiofs        = []
