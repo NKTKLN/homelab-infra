@@ -115,6 +115,18 @@ locals {
       firewall_enable = false
       firewall_rules  = []
     }
+
+    "vm-docker-worker" = {
+      hostname        = "vm-docker-worker"
+      cores           = 4
+      memory          = 6144
+      disk_size       = 40
+      ipaddr          = "192.168.1.18/24"
+      virtiofs        = []
+      pci_devices     = []
+      firewall_enable = false
+      firewall_rules  = []
+    }
   }
 
   container_definitions = {
