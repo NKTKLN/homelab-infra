@@ -1,0 +1,21 @@
+- name: Ensure Debian family
+  ansible.builtin.assert:
+    that:
+      - ansible_facts['os_family'] == "Debian"
+    fail_msg: "This role supports only Debian/Ubuntu."
+
+- name: Ensure apt keyrings directory exists
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: "0755"
+
+- ansible.builtin.import_tasks: cuda.yml
+  tags: [cuda, drivers, install]
+
+- ansible.builtin.import_tasks: container_toolkit.yml
+  tags: [cuda, toolkit]
+
+- ansible.builtin.import_tasks: docker.yml
+  when: nvidia_configure_docker_runtime | bool
+  tags: [cuda, toolkit, docker]

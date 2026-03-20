@@ -1,0 +1,43 @@
+- name: Install linux headers
+  ansible.builtin.apt:
+    name:
+      - "linux-headers-{{ ansible_facts['kernel'] }}"
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Download CUDA keyring package
+  ansible.builtin.get_url:
+    url: "https://developer.download.nvidia.com/compute/cuda/repos/{{ nvidia_distro_name }}/x86_64/cuda-keyring_1.1-1_all.deb"
+    dest: /tmp/
+    mode: "0644"
+    timeout: 60
+
+- name: Install CUDA keyring package
+  ansible.builtin.apt:
+    deb: /tmp/cuda-keyring_1.1-1_all.deb
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Download CUDA GPG key
+  ansible.builtin.get_url:
+    url: "https://developer.download.nvidia.com/compute/cuda/repos/{{ nvidia_distro_name }}/x86_64/cuda-archive-keyring.gpg"
+    dest: /etc/apt/keyrings/cuda-archive-keyring.gpg
+    mode: "0644"
+    timeout: 60
+
+- name: Add CUDA repository
+  ansible.builtin.apt_repository:
+    repo: >-
+      deb [signed-by=/usr/share/keyrings/cuda-archive-keyring.gpg] https://developer.download.nvidia.com/compute/cuda/repos/{{ nvidia_distro_name }}/x86_64/ /
+    filename: cuda
+    state: present
+    update_cache: false
+
+- name: Install CUDA packages
+  ansible.builtin.apt:
+    name:
+      - cuda-drivers
+    state: present
+    update_cache: true
