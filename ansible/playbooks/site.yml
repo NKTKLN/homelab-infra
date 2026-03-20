@@ -26,15 +26,6 @@
         name: base_container
       tags: [base]
 
-- name: Docker workers servers
-  hosts: docker-workers
-  become: true
-  tasks:
-    - name: Apply docker role
-      ansible.builtin.import_role:
-        name: docker
-      tags: [docker]
-
 - name: Storage servers
   hosts: storage
   become: true
@@ -57,6 +48,24 @@
       ansible.builtin.import_role:
         name: wireguard
       tags: [vpn]
+
+- name: Docker workers servers
+  hosts: docker-workers
+  become: true
+  tasks:
+    - name: Apply docker role
+      ansible.builtin.import_role:
+        name: docker
+      tags: [docker]
+
+- name: k8s gpu workers servers
+  hosts: k8s-gpu-workers
+  become: true
+  tasks:
+    - name: Install CUDA
+      ansible.builtin.import_role:
+        name: cuda_tools
+      tags: [cuda]
 
 - name: Sandbox servers
   hosts: sandbox

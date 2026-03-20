@@ -4,7 +4,8 @@ resource "proxmox_virtual_environment_vm" "vm" {
   node_name = var.node_name
 
   # Using Q35 with viommu ensures compatibility with PCI passthrough and modern guest OSes
-  machine = "q35,viommu=virtio"
+  machine = "q35"
+  bios    = "ovmf"
 
   startup {
     # Ensure VM starts early in boot order (useful for cluster dependencies)
@@ -21,6 +22,7 @@ resource "proxmox_virtual_environment_vm" "vm" {
 
   # CPU / RAM
   cpu {
+    type    = "host"
     sockets = 1
     cores   = var.cores
   }

@@ -10,12 +10,13 @@
     state: directory
     mode: "0755"
 
-- ansible.builtin.import_tasks: cuda.yml
+- ansible.builtin.import_tasks: driver.yml
   tags: [cuda, drivers, install]
 
 - ansible.builtin.import_tasks: container_toolkit.yml
   tags: [cuda, toolkit]
 
-- ansible.builtin.import_tasks: docker.yml
-  when: nvidia_configure_docker_runtime | bool
-  tags: [cuda, toolkit, docker]
+- name: Reboot the machine
+  reboot:
+    msg: "Reboot after NVIDIA driver installation"
+    pre_reboot_delay: 10

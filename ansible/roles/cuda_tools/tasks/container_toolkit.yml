@@ -15,7 +15,7 @@
 - name: Add NVIDIA Container Toolkit repository
   ansible.builtin.apt_repository:
     repo: >-
-      deb [signed-by=/etc/apt/keyrings/nvidia-container-toolkit.gpg] https://nvidia.github.io/libnvidia-container/stable/deb/{{ nvidia_container_toolkit_arch }} /
+      deb [signed-by=/etc/apt/keyrings/nvidia-container-toolkit.gpg] https://nvidia.github.io/libnvidia-container/stable/deb/amd64 /
     filename: nvidia-container-toolkit
     state: present
     update_cache: false
@@ -26,3 +26,17 @@
     state: present
     update_cache: true
     cache_valid_time: 3600
+
+- name: Configure NVIDIA runtime for Docker
+  ansible.builtin.command:
+    cmd: nvidia-ctk runtime configure --runtime=docker
+  changed_when: false
+  when: nvidia_configure_docker_runtime | bool
+  notify: restart docker
+
+- name: Configure NVIDIA runtime for containerd
+  ansible.builtin.command:
+    cmd: nvidia-ctk runtime configure --runtime=containerd
+  changed_when: false
+  when: nvidia_configure_containerd_runtime | bool
+  notify: restart containerd
