@@ -58,14 +58,23 @@
         name: docker
       tags: [docker]
 
-- name: k8s gpu workers servers
-  hosts: k8s-gpu-workers
+- name: GPU workers servers
+  hosts: gpu-workers
   become: true
   tasks:
-    - name: Install CUDA
+    - name: Apply cuda_tools role
       ansible.builtin.import_role:
         name: cuda_tools
       tags: [cuda]
+
+- name: k3s setup
+  hosts: k8s
+  become: true
+  tasks:
+    - name: Apply k3s role
+      ansible.builtin.import_role:
+        name: k3s
+      tags: [k8s]
 
 - name: Sandbox servers
   hosts: sandbox

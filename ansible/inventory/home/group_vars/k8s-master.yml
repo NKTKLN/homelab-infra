@@ -1,0 +1,2 @@
+ufw_allowed_ports_tcp: [6443, 10250, "30000:32767"]
+ufw_allowed_ports_udp: [8472]

@@ -1,0 +1,8 @@
+- ansible.builtin.import_tasks: swap.yml
+  tags: [swap]
+
+- ansible.builtin.import_tasks: hosts.yml
+  tags: [k8s, hostfile]
+
+- ansible.builtin.import_tasks: setup.yml
+  tags: [k8s, install]
