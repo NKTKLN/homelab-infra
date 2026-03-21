@@ -7,6 +7,11 @@ resource "proxmox_virtual_environment_vm" "vm" {
   machine = "q35"
   bios    = "ovmf"
 
+  efi_disk {
+    datastore_id = var.disk_storage
+    type         = "4m"
+  }
+
   startup {
     # Ensure VM starts early in boot order (useful for cluster dependencies)
     order      = 1

@@ -32,3 +32,14 @@
     name: nvidia-driver-535
     state: present
     update_cache: false
+
+- name: Enable persistence mode
+  ansible.builtin.command: nvidia-smi -pm 1
+
+- name: Configure CUDA environment
+  ansible.builtin.template:
+    src: cuda-profile.d.j2
+    dest: /etc/profile.d/cuda.sh
+    owner: root
+    group: root
+    mode: "0644"
