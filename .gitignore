@@ -54,6 +54,7 @@ vault_pass.txt
 tmp/
 cache/
 ansible.log
+.ansible/
 
 # Inventory files with sensitive data
 inventory.yaml
@@ -67,6 +68,14 @@ group_vars/*_vault.yml
 host_vars/*_vault.yml
 group_vars/*_secret.yml
 host_vars/*_secret.yml
+
+# ========================
+# Virtual Envs
+# ========================
+.env
+.venv/
+venv/
+env/
 
 # ========================
 # IDEs / Editors
