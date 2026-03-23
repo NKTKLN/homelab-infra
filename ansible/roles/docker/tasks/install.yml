@@ -28,6 +28,11 @@
     filename: docker
     update_cache: true
 
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+
 - name: Install Docker packages
   ansible.builtin.apt:
     name:
@@ -35,8 +40,6 @@
       - docker-ce-cli
       - containerd.io
     state: present
-    update_cache: true
-    cache_valid_time: 3600
 
 - name: Ensure Docker service is enabled and running
   ansible.builtin.service:

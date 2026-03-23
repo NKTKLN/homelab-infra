@@ -4,44 +4,8 @@
       - ansible_facts['os_family'] == "Debian"
     fail_msg: "This role supports only Debian/Ubuntu."
 
-- name: Ensure apt keyrings directory exists
-  ansible.builtin.file:
-    path: /etc/apt/keyrings
-    state: directory
-    mode: "0755"
+- ansible.builtin.import_tasks: install.yml
+  tags: [kubernetes, install]
 
-- name: Download Kubernetes GPG key
-  ansible.builtin.get_url:
-    url: "https://pkgs.k8s.io/core:/stable:/{{ kubernetes_version }}/deb/Release.key"
-    dest: /etc/apt/keyrings/kubernetes.asc
-    mode: "0644"
-    timeout: 60
-
-- name: Dearmor Kubernetes GPG key
-  ansible.builtin.command: >
-    gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg /etc/apt/keyrings/kubernetes.asc
-  args:
-    creates: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
-
-- name: Add Kubernetes repository
-  ansible.builtin.apt_repository:
-    repo: >-
-      deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/{{ kubernetes_version }}/deb/ /
-    filename: kubernetes
-    state: present
-    update_cache: false
-
-- name: Install Kubernetes packages
-  ansible.builtin.apt:
-    name:
-      - kubelet
-      - kubeadm
-      - kubectl
-    state: present
-    update_cache: true
-
-- name: Ensure kubelet is enabled and running
-  ansible.builtin.service:
-    name: kubelet
-    state: started
-    enabled: true
+- ansible.builtin.import_tasks: configure.yml
+  tags: [kubernetes, configure]

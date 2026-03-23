@@ -1,0 +1,19 @@
+- name: Ensure kube directory exists
+  ansible.builtin.file:
+    path: "/home/{{ kubernetes_user }}/.kube"
+    state: directory
+    owner: "{{ kubernetes_user }}"
+    group: "{{ kubernetes_user }}"
+    mode: "0755"
+
+- name: Copy k3s config
+  ansible.builtin.copy:
+    content: "{{ hostvars[groups['k8s-master'][0]]['k3s_config']['content'] | b64decode }}"
+    dest: "/home/{{ kubernetes_user }}/.kube/config"
+    mode: "0755"
+
+- name: Replace localhost with master node IP
+  ansible.builtin.replace:
+    path: "/home/{{ kubernetes_user }}/.kube/config"
+    regexp: '^\s*server:\s*https://127\.0\.0\.1:6443\s*$'
+    replace: "server: https://{{ hostvars[groups['k8s-master'][0]].ansible_host }}:6443"

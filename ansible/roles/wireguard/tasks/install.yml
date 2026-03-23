@@ -1,9 +1,12 @@
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+
 - name: Install wireguard
   ansible.builtin.apt:
     name: wireguard
     state: present
-    update_cache: true
-    cache_valid_time: 3600
 
 - name: Create WireGuard config directory
   ansible.builtin.file:
@@ -21,8 +24,7 @@
     group: root
     mode: "0700"
 
-- name: Ensure WireGuard service is enabled and running
+- name: Ensure WireGuard service is enabled
   ansible.builtin.systemd:
     name: "wg-quick@{{ wireguard_interface }}"
-    state: started
     enabled: true

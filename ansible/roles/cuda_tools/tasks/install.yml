@@ -11,27 +11,29 @@
 - name: Download CUDA keyring package
   ansible.builtin.get_url:
     url: "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/cuda-keyring_1.1-1_all.deb"
-    dest: /tmp/cuda-keyring_1.1-1_all.deb
+    dest: /var/tmp/cuda-keyring_1.1-1_all.deb
     mode: "0644"
     timeout: 60
 
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+
 - name: Install CUDA keyring package
   ansible.builtin.apt:
-    deb: /tmp/cuda-keyring_1.1-1_all.deb
+    deb: /var/tmp/cuda-keyring_1.1-1_all.deb
     state: present
-    update_cache: true
 
 - name: Install CUDA toolkit
   ansible.builtin.apt:
     name: cuda-toolkit-13-2
     state: present
-    update_cache: true
 
 - name: Install Ubuntu NVIDIA driver
   ansible.builtin.apt:
     name: nvidia-driver-535
     state: present
-    update_cache: false
 
 - name: Enable persistence mode
   ansible.builtin.command: nvidia-smi -pm 1

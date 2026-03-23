@@ -3,7 +3,6 @@
     that: ansible_facts.os_family == "Debian"
     fail_msg: "This role supports only Debian/Ubuntu."
 
-
 - name: Install and prepare WireGuard
   ansible.builtin.import_tasks: install.yml
   tags: [vpn, install]

@@ -21,6 +21,12 @@
     k3s_node_token: "{{ k3s_token_raw.content | b64decode | trim }}"
   when: inventory_hostname == groups['k8s-master'][0]
 
+- name: Read k3s master config
+  ansible.builtin.slurp:
+    src: /etc/rancher/k3s/k3s.yaml
+  register: k3s_config
+  when: inventory_hostname == groups['k8s-master'][0]
+
 - name: Install k3s worker
   shell: |
     curl -sfL https://get.k3s.io | sh -

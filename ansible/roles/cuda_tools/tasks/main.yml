@@ -10,7 +10,7 @@
     state: directory
     mode: "0755"
 
-- ansible.builtin.import_tasks: cuda.yml
+- ansible.builtin.import_tasks: install.yml
   tags: [cuda, drivers, install]
 
 - ansible.builtin.import_tasks: container_toolkit.yml
