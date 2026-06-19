@@ -2,3 +2,50 @@
 kubernetes_enabled: true
 kubernetes_version: "v1.35"
 kubernetes_user: "{{ ansible_user }}"
+
+# Extra CLI tooling installed alongside kubectl on the management node.
+kubernetes_install_tools: true
+
+# Helm (installed from the official apt repository so apt keeps it updated).
+kubernetes_install_helm: true
+
+# Standalone CLI binaries pulled from GitHub releases.
+# Each item: name (== binary name), version, url, archive (tar.gz vs raw binary).
+# Pinned versions — bump as needed.
+kubernetes_cli_bin_dir: /usr/local/bin
+kubernetes_cli_state_dir: /usr/local/lib/kube-cli
+kubernetes_cli_tools:
+  - name: k9s # cluster TUI
+    version: "v0.32.7"
+    archive: true
+    url: "https://github.com/derailed/k9s/releases/download/{{ item.version }}/k9s_Linux_amd64.tar.gz"
+
+  - name: stern # multi-pod log tailing
+    version: "1.32.0"
+    archive: true
+    url: "https://github.com/stern/stern/releases/download/v{{ item.version }}/stern_{{ item.version }}_linux_amd64.tar.gz"
+
+  - name: kustomize # manifest templating
+    version: "5.5.0"
+    archive: true
+    url: "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv{{ item.version }}/kustomize_v{{ item.version }}_linux_amd64.tar.gz"
+
+  - name: helmfile # declarative helm releases
+    version: "0.169.0"
+    archive: true
+    url: "https://github.com/helmfile/helmfile/releases/download/v{{ item.version }}/helmfile_{{ item.version }}_linux_amd64.tar.gz"
+
+  - name: argocd # ArgoCD CLI
+    version: "2.13.3"
+    archive: false
+    url: "https://github.com/argoproj/argo-cd/releases/download/v{{ item.version }}/argocd-linux-amd64"
+
+  - name: kubectx # context switcher
+    version: "0.9.5"
+    archive: true
+    url: "https://github.com/ahmetb/kubectx/releases/download/v{{ item.version }}/kubectx_v{{ item.version }}_linux_x86_64.tar.gz"
+
+  - name: kubens # namespace switcher
+    version: "0.9.5"
+    archive: true
+    url: "https://github.com/ahmetb/kubectx/releases/download/v{{ item.version }}/kubens_v{{ item.version }}_linux_x86_64.tar.gz"

@@ -1,0 +1,40 @@
+# Helm — installed from the official apt repository.
+- name: Download Helm GPG key
+  ansible.builtin.get_url:
+    url: https://baltocdn.com/helm/signing.asc
+    dest: /etc/apt/keyrings/helm.asc
+    mode: "0644"
+    timeout: 60
+  when: kubernetes_install_helm | bool
+
+- name: Add Helm repository
+  ansible.builtin.apt_repository:
+    repo: >-
+      deb [signed-by=/etc/apt/keyrings/helm.asc] https://baltocdn.com/helm/stable/debian/ all main
+    filename: helm
+    state: present
+    update_cache: true
+  when: kubernetes_install_helm | bool
+
+- name: Install Helm
+  ansible.builtin.apt:
+    name: helm
+    state: present
+  when: kubernetes_install_helm | bool
+
+# Standalone CLI binaries from GitHub releases.
+- name: Ensure CLI state directory exists
+  ansible.builtin.file:
+    path: "{{ kubernetes_cli_state_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  when: kubernetes_cli_tools | length > 0
+
+- name: Install standalone Kubernetes CLI tools
+  ansible.builtin.include_tasks: tools_binary.yml
+  loop: "{{ kubernetes_cli_tools }}"
+  loop_control:
+    loop_var: tool
+    label: "{{ tool.name }} {{ tool.version }}"
