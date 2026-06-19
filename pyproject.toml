@@ -1,5 +1,5 @@
 [project]
-name = "homelab"
+name = "homelab_infra"
 version = "0.1.0"
 description = "Infrastructure-as-code for my homelab platform."
 authors = [{ name = "NKTKLN", email = "nktkln@nktkln.com" }]

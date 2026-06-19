@@ -151,16 +151,6 @@ pve_token_secret = "<secret>"
 
 ---
 
-## 🧩 Why this repo?
-
-> Treat infrastructure like code — reproducible, versioned, and testable.
-
-This setup allows you to:
-
-* rebuild the entire homelab from scratch
-* manage infrastructure changes via Git
-* keep provisioning and configuration cleanly separated
-
 ## 🧪 TODO
 
 * [ ] Fix WireGuard configuration (split tunneling)
