@@ -10,46 +10,44 @@ env:
   ANSIBLE_INVENTORY: 'inventory/home/hosts.ini'
 
 tasks:
-  # ======== Environment ========
+   # ======== Environment ========
   sync:
     desc: Sync dependencies (dev group) using uv
     cmds:
-      - uv sync
+      - uv sync --all-groups
 
-  precommit:
-    desc: Install git hooks
-    deps: [sync]
+  sync-frozen:
+    desc: Sync dependencies using locked versions
     cmds:
-      - uv run pre-commit install
+      - uv sync --frozen --all-groups
 
   init:
     desc: Full project setup
-    deps: [sync, precommit]
+    cmds:
+      - task: sync
+      - task: precommit
+
+  # ======== Pre-commit ========
+  precommit:
+    desc: Install git hooks
+    cmds:
+      - uv run pre-commit install --install-hooks
+
+  precommit-run:
+    desc: Run pre-commit on all files
+    cmds:
+      - uv run pre-commit run --all-files
 
   # ======== Commitizen ========
   cz-commit:
     desc: Commit using Conventional Commits
-    deps: [sync]
     cmds:
       - uv run cz commit
 
   cz-check:
     desc: Check commit messages
-    deps: [sync]
     cmds:
       - uv run cz check
-
-  cz-bump:
-    desc: Bump version and update changelog
-    deps: [sync]
-    cmds:
-      - uv run cz bump
-
-  release:
-    desc: Bump version and push tags
-    deps: [cz-bump]
-    cmds:
-      - git push --follow-tags
 
   # ======== Terraform / OpenTofu ========
   tf-init:

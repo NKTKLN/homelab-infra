@@ -1,0 +1,10 @@
+- name: Ensure Debian family
+  ansible.builtin.assert:
+    that: ansible_facts.os_family == "Debian"
+    fail_msg: "This role supports only Debian/Ubuntu."
+
+- ansible.builtin.import_tasks: install.yml
+  tags: [nfs, install]
+
+- ansible.builtin.import_tasks: mount.yml
+  tags: [nfs, mount]

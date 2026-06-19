@@ -9,3 +9,10 @@ common_packages_extra:
   - tree
   - yq
   - neovim
+  - nfs-common
+
+# NFS shares mounted from the storage node (vm-storage-node).
+# Exports are defined in the nfs-server role defaults.
+nfs_client_mounts:
+  - src: "/mnt/hard-drive/nfs/docker"
+    path: "/mnt/nfs/docker"

@@ -1,0 +1,17 @@
+# NFS server to mount exports from (defaults to the storage node).
+nfs_client_server_host: "{{ hostvars['vm-storage-node']['ansible_host'] }}"
+
+# Ownership applied to the local mount-point directories (before mounting).
+nfs_client_mount_owner: "{{ ansible_user }}"
+nfs_client_mount_group: "{{ ansible_user }}"
+nfs_client_mount_mode: "0755"
+
+# Default mount options for NFSv4.
+nfs_client_mount_opts: "rw,hard,intr,_netdev,noatime"
+
+# Mounts to create. Set per host/group in group_vars.
+# Each item:
+#   src:  exported path on the NFS server
+#   path: local mount point
+#   opts: (optional) override of nfs_client_mount_opts
+nfs_client_mounts: []

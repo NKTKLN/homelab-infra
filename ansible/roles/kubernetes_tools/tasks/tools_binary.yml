@@ -1,0 +1,38 @@
+# Per-tool installation, gated by a version marker so reruns are idempotent
+# and a version bump triggers a reinstall.
+- name: "Check installed marker for {{ tool.name }}"
+  ansible.builtin.stat:
+    path: "{{ kubernetes_cli_state_dir }}/{{ tool.name }}-{{ tool.version }}"
+  register: kube_tool_marker
+
+- name: "Install CLI tool {{ tool.name }}"
+  when: not kube_tool_marker.stat.exists
+  block:
+    - name: "Download and extract {{ tool.name }}"
+      ansible.builtin.unarchive:
+        src: "{{ tool.url }}"
+        dest: "{{ kubernetes_cli_bin_dir }}"
+        remote_src: true
+        include: ["{{ tool.name }}"]
+        owner: root
+        group: root
+        mode: "0755"
+      when: tool.archive | default(true)
+
+    - name: "Download raw binary for {{ tool.name }}"
+      ansible.builtin.get_url:
+        url: "{{ tool.url }}"
+        dest: "{{ kubernetes_cli_bin_dir }}/{{ tool.name }}"
+        owner: root
+        group: root
+        mode: "0755"
+        timeout: 60
+      when: not (tool.archive | default(true))
+
+    - name: "Record version marker for {{ tool.name }}"
+      ansible.builtin.copy:
+        content: "{{ tool.version }}\n"
+        dest: "{{ kubernetes_cli_state_dir }}/{{ tool.name }}-{{ tool.version }}"
+        owner: root
+        group: root
+        mode: "0644"

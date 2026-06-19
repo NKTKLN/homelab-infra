@@ -7,5 +7,9 @@
 - ansible.builtin.import_tasks: install.yml
   tags: [kubernetes, install]
 
+- ansible.builtin.import_tasks: tools.yml
+  tags: [kubernetes, tools]
+  when: kubernetes_install_tools | bool
+
 - ansible.builtin.import_tasks: configure.yml
   tags: [kubernetes, configure]

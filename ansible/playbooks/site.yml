@@ -108,6 +108,11 @@
         name: zsh
       tags: [shell]
 
+    - name: Apply nfs-client role
+      ansible.builtin.import_role:
+        name: nfs-client
+      tags: [nfs]
+
     - name: Apply fail2ban role
       ansible.builtin.import_role:
         name: fail2ban
