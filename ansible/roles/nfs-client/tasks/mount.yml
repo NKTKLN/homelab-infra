@@ -1,0 +1,21 @@
+- name: Ensure NFS mount points exist
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: "{{ nfs_client_mount_owner }}"
+    group: "{{ nfs_client_mount_group }}"
+    mode: "{{ nfs_client_mount_mode }}"
+  loop: "{{ nfs_client_mounts }}"
+  loop_control:
+    label: "{{ item.path }}"
+
+- name: Mount NFS exports (persist in fstab)
+  ansible.builtin.mount:
+    path: "{{ item.path }}"
+    src: "{{ nfs_client_server_host }}:{{ item.src }}"
+    fstype: nfs4
+    opts: "{{ item.opts | default(nfs_client_mount_opts) }}"
+    state: mounted
+  loop: "{{ nfs_client_mounts }}"
+  loop_control:
+    label: "{{ item.path }}"
