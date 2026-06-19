@@ -1,74 +1,4 @@
-# Helm — installed from the community-maintained apt repository.
-- name: Ensure apt keyrings directory exists
-  ansible.builtin.file:
-    path: /etc/apt/keyrings
-    state: directory
-    mode: "0755"
-  when: kubernetes_install_helm | bool
-
-- name: Ensure Helm repository dependencies are installed
-  ansible.builtin.apt:
-    name:
-      - apt-transport-https
-      - gpg
-    state: present
-    update_cache: true
-    cache_valid_time: 3600
-  when: kubernetes_install_helm | bool
-
-- name: Download Helm Buildkite GPG key
-  ansible.builtin.get_url:
-    url: https://packages.buildkite.com/helm-linux/helm-debian/gpgkey
-    dest: /etc/apt/keyrings/helm-buildkite.asc
-    mode: "0644"
-    timeout: 60
-  register: helm_buildkite_key
-  when: kubernetes_install_helm | bool
-
-- name: Verify Helm Buildkite GPG key fingerprint
-  ansible.builtin.command: >-
-    gpg --show-keys --with-colons /etc/apt/keyrings/helm-buildkite.asc
-  register: helm_buildkite_key_info
-  changed_when: false
-  failed_when: >-
-    'DDF78C3E6EBB2D2CC223C95C62BA89D07698DBC6' not in helm_buildkite_key_info.stdout
-  when: kubernetes_install_helm | bool
-
-- name: Check Helm Buildkite keyring
-  ansible.builtin.stat:
-    path: /etc/apt/keyrings/helm-buildkite.gpg
-  register: helm_buildkite_keyring
-  when: kubernetes_install_helm | bool
-
-- name: Dearmor Helm Buildkite GPG key
-  ansible.builtin.command: >-
-    gpg --dearmor --yes -o /etc/apt/keyrings/helm-buildkite.gpg /etc/apt/keyrings/helm-buildkite.asc
-  when:
-    - kubernetes_install_helm | bool
-    - helm_buildkite_key.changed or not helm_buildkite_keyring.stat.exists
-
-- name: Remove legacy Helm GPG key
-  ansible.builtin.file:
-    path: /etc/apt/keyrings/helm.asc
-    state: absent
-  when: kubernetes_install_helm | bool
-
-- name: Add Helm repository
-  ansible.builtin.apt_repository:
-    repo: >-
-      deb [signed-by=/etc/apt/keyrings/helm-buildkite.gpg] https://packages.buildkite.com/helm-linux/helm-debian/any/ any main
-    filename: helm
-    state: present
-    update_cache: true
-  when: kubernetes_install_helm | bool
-
-- name: Install Helm
-  ansible.builtin.apt:
-    name: helm
-    state: present
-  when: kubernetes_install_helm | bool
-
-# Standalone CLI binaries from GitHub releases.
+# Helm — installed through the official Helm install script.
 - name: Ensure CLI state directory exists
   ansible.builtin.file:
     path: "{{ kubernetes_cli_state_dir }}"
@@ -76,11 +6,57 @@
     owner: root
     group: root
     mode: "0755"
-  when: kubernetes_cli_tools | length > 0
+  when: >
+    kubernetes_install_helm | bool
+    or kubernetes_cli_tools | length > 0
 
+- name: Ensure Helm installer dependencies are installed
+  ansible.builtin.apt:
+    name:
+      - ca-certificates
+      - curl
+      - openssl
+      - tar
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+  when: kubernetes_install_helm | bool
+
+- name: Remove Helm package installed through APT
+  ansible.builtin.apt:
+    name: helm
+    state: absent
+  when: kubernetes_install_helm | bool
+
+- name: Install Helm through official get-helm-4 script
+  ansible.builtin.shell: |
+    set -euo pipefail
+    curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-4 \
+      | bash -s -- --no-sudo
+  args:
+    executable: /bin/bash
+  environment:
+    HELM_INSTALL_DIR: "{{ kubernetes_cli_bin_dir }}"
+    VERIFY_CHECKSUM: "true"
+    VERIFY_SIGNATURES: "false"
+    USE_SUDO: "false"
+  register: helm_install_result
+  changed_when: >-
+    'installed into' in helm_install_result.stdout
+    or 'Changing from version' in helm_install_result.stdout
+  when: kubernetes_install_helm | bool
+
+- name: Check Helm version
+  ansible.builtin.command: "{{ kubernetes_cli_bin_dir }}/helm version --short"
+  register: helm_version_check
+  changed_when: false
+  when: kubernetes_install_helm | bool
+
+# Standalone CLI binaries from GitHub releases.
 - name: Install standalone Kubernetes CLI tools
   ansible.builtin.include_tasks: tools_binary.yml
   loop: "{{ kubernetes_cli_tools }}"
   loop_control:
     loop_var: tool
     label: "{{ tool.name }} {{ tool.version }}"
+  when: kubernetes_cli_tools | length > 0
