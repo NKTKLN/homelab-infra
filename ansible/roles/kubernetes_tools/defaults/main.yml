@@ -6,6 +6,9 @@ kubernetes_user: "{{ ansible_user }}"
 # Extra CLI tooling installed alongside kubectl on the management node.
 kubernetes_install_tools: true
 
+# Helm
+kubernetes_install_helm: true
+
 # Standalone CLI binaries pulled from GitHub releases.
 # Each item: name (== binary name), version, url, archive (tar.gz vs raw binary).
 # Pinned versions — bump as needed.
