@@ -22,12 +22,6 @@
     cache_valid_time: 3600
   when: kubernetes_install_helm | bool
 
-- name: Remove Helm package installed through APT
-  ansible.builtin.apt:
-    name: helm
-    state: absent
-  when: kubernetes_install_helm | bool
-
 - name: Install Helm through official get-helm-4 script
   ansible.builtin.shell: |
     set -euo pipefail
