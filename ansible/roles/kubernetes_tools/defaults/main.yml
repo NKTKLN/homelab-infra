@@ -10,42 +10,41 @@ kubernetes_install_tools: true
 kubernetes_install_helm: true
 
 # Standalone CLI binaries pulled from GitHub releases.
-# Each item: name (== binary name), version, url, archive (tar.gz vs raw binary).
-# Pinned versions — bump as needed.
 kubernetes_cli_bin_dir: /usr/local/bin
 kubernetes_cli_state_dir: /usr/local/lib/kube-cli
+
 kubernetes_cli_tools:
-  - name: k9s # cluster TUI
+  - name: k9s
     version: "v0.32.7"
     archive: true
-    url: "https://github.com/derailed/k9s/releases/download/{{ tool.version }}/k9s_Linux_amd64.tar.gz"
+    url_template: "https://github.com/derailed/k9s/releases/download/{version}/k9s_Linux_amd64.tar.gz"
 
-  - name: stern # multi-pod log tailing
+  - name: stern
     version: "1.32.0"
     archive: true
-    url: "https://github.com/stern/stern/releases/download/v{{ tool.version }}/stern_{{ tool.version }}_linux_amd64.tar.gz"
+    url_template: "https://github.com/stern/stern/releases/download/v{version}/stern_{version}_linux_amd64.tar.gz"
 
-  - name: kustomize # manifest templating
+  - name: kustomize
     version: "5.5.0"
     archive: true
-    url: "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv{{ tool.version }}/kustomize_v{{ tool.version }}_linux_amd64.tar.gz"
+    url_template: "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv{version}/kustomize_v{version}_linux_amd64.tar.gz"
 
-  - name: helmfile # declarative helm releases
+  - name: helmfile
     version: "0.169.0"
     archive: true
-    url: "https://github.com/helmfile/helmfile/releases/download/v{{ tool.version }}/helmfile_{{ tool.version }}_linux_amd64.tar.gz"
+    url_template: "https://github.com/helmfile/helmfile/releases/download/v{version}/helmfile_{version}_linux_amd64.tar.gz"
 
-  - name: argocd # ArgoCD CLI
+  - name: argocd
     version: "2.13.3"
     archive: false
-    url: "https://github.com/argoproj/argo-cd/releases/download/v{{ tool.version }}/argocd-linux-amd64"
+    url_template: "https://github.com/argoproj/argo-cd/releases/download/v{version}/argocd-linux-amd64"
 
-  - name: kubectx # context switcher
+  - name: kubectx
     version: "0.9.5"
     archive: true
-    url: "https://github.com/ahmetb/kubectx/releases/download/v{{ tool.version }}/kubectx_v{{ tool.version }}_linux_x86_64.tar.gz"
+    url_template: "https://github.com/ahmetb/kubectx/releases/download/v{version}/kubectx_v{version}_linux_x86_64.tar.gz"
 
-  - name: kubens # namespace switcher
+  - name: kubens
     version: "0.9.5"
     archive: true
-    url: "https://github.com/ahmetb/kubectx/releases/download/v{{ tool.version }}/kubens_v{{ tool.version }}_linux_x86_64.tar.gz"
+    url_template: "https://github.com/ahmetb/kubectx/releases/download/v{version}/kubens_v{version}_linux_x86_64.tar.gz"

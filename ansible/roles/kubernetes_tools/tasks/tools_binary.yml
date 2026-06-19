@@ -1,35 +1,70 @@
 # Per-tool installation, gated by a version marker so reruns are idempotent
 # and a version bump triggers a reinstall.
-- name: "Check installed marker for {{ tool.name }}"
+- name: Build download URL for {{ tool.name }}
+  ansible.builtin.set_fact:
+    tool_url: "{{ tool.url_template | replace('{version}', tool.version) }}"
+
+- name: Check installed marker for {{ tool.name }}
   ansible.builtin.stat:
     path: "{{ kubernetes_cli_state_dir }}/{{ tool.name }}-{{ tool.version }}"
-  register: kube_tool_marker
+  register: tool_marker
 
-- name: "Install CLI tool {{ tool.name }}"
-  when: not kube_tool_marker.stat.exists
+- name: Install {{ tool.name }} from archive
+  when:
+    - tool.archive | bool
+    - not tool_marker.stat.exists
   block:
-    - name: "Download and extract {{ tool.name }}"
+    - name: Download {{ tool.name }}
+      ansible.builtin.get_url:
+        url: "{{ tool_url }}"
+        dest: "/tmp/{{ tool.name }}-{{ tool.version }}.tar.gz"
+        owner: root
+        group: root
+        mode: "0644"
+        timeout: 120
+      register: tool_download
+      retries: 3
+      delay: 5
+      until: tool_download is succeeded
+
+    - name: Extract {{ tool.name }}
       ansible.builtin.unarchive:
-        src: "{{ tool.url }}"
+        src: "/tmp/{{ tool.name }}-{{ tool.version }}.tar.gz"
         dest: "{{ kubernetes_cli_bin_dir }}"
         remote_src: true
-        include: ["{{ tool.name }}"]
+        include:
+          - "{{ tool.name }}"
         owner: root
         group: root
         mode: "0755"
-      when: tool.archive | default(true)
 
-    - name: "Download raw binary for {{ tool.name }}"
+    - name: Record {{ tool.name }} version marker
+      ansible.builtin.copy:
+        content: "{{ tool.version }}\n"
+        dest: "{{ kubernetes_cli_state_dir }}/{{ tool.name }}-{{ tool.version }}"
+        owner: root
+        group: root
+        mode: "0644"
+
+- name: Install {{ tool.name }} raw binary
+  when:
+    - not tool.archive | bool
+    - not tool_marker.stat.exists
+  block:
+    - name: Download {{ tool.name }} binary
       ansible.builtin.get_url:
-        url: "{{ tool.url }}"
+        url: "{{ tool_url }}"
         dest: "{{ kubernetes_cli_bin_dir }}/{{ tool.name }}"
         owner: root
         group: root
         mode: "0755"
-        timeout: 60
-      when: not (tool.archive | default(true))
+        timeout: 120
+      register: tool_download
+      retries: 3
+      delay: 5
+      until: tool_download is succeeded
 
-    - name: "Record version marker for {{ tool.name }}"
+    - name: Record {{ tool.name }} version marker
       ansible.builtin.copy:
         content: "{{ tool.version }}\n"
         dest: "{{ kubernetes_cli_state_dir }}/{{ tool.name }}-{{ tool.version }}"
