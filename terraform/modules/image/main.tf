@@ -8,5 +8,9 @@ resource "proxmox_virtual_environment_download_file" "image" {
   url       = var.image_url
   file_name = var.image_file_name
 
+  # Do not re-download on every apply...
   overwrite = false
+  # ...but adopt a file that already exists in the datastore (from a previous
+  # run or a manual upload) instead of failing the apply.
+  overwrite_unmanaged = true
 }
