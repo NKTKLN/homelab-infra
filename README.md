@@ -30,8 +30,7 @@ The infrastructure is defined declaratively and split into two layers:
   * PCI passthrough (GPU)
 * **Ansible**
   * baseline configuration
-  * k3s cluster setup
-  * Docker, VPN, storage, ops tooling
+  * Docker, VPN, ops tooling
 
 ## 🚀 Workflow
 
