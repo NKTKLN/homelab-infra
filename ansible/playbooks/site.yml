@@ -26,20 +26,6 @@
         name: base_container
       tags: [base]
 
-- name: Storage servers
-  hosts: storage
-  become: true
-  tasks:
-    - name: Apply virtiofs role
-      ansible.builtin.import_role:
-        name: virtiofs
-      tags: [storage]
-
-    - name: Apply nfs-server role
-      ansible.builtin.import_role:
-        name: nfs-server
-      tags: [storage, nfs]
-
 - name: VPN servers
   hosts: vpn
   become: true
@@ -49,8 +35,17 @@
         name: wireguard
       tags: [vpn]
 
-- name: Docker workers servers
-  hosts: docker-workers
+- name: Gateway servers
+  hosts: gateway
+  become: true
+  tasks:
+    - name: Apply caddy role
+      ansible.builtin.import_role:
+        name: caddy
+      tags: [caddy]
+
+- name: GPU workers servers
+  hosts: gpu-workers
   become: true
   tasks:
     - name: Apply docker role
@@ -58,26 +53,27 @@
         name: docker
       tags: [docker]
 
-- name: GPU workers servers
-  hosts: gpu-workers
-  become: true
-  tasks:
     - name: Apply cuda_tools role
       ansible.builtin.import_role:
         name: cuda_tools
       tags: [cuda]
 
-- name: k3s setup
-  hosts: k8s
+- name: Amnezia proxy servers
+  hosts: proxy
   become: true
   tasks:
-    - name: Apply k3s role
+    - name: Apply docker role
       ansible.builtin.import_role:
-        name: k3s
-      tags: [k8s]
+        name: docker
+      tags: [docker]
 
-- name: Sandbox servers
-  hosts: sandbox
+    - name: Apply amnezia_proxy role
+      ansible.builtin.import_role:
+        name: amnezia_proxy
+      tags: [amnezia, proxy]
+
+- name: Regular nodes
+  hosts: nodes
   become: true
   tasks:
     - name: Apply zsh role
@@ -108,11 +104,6 @@
         name: zsh
       tags: [shell]
 
-    - name: Apply nfs-client role
-      ansible.builtin.import_role:
-        name: nfs-client
-      tags: [nfs]
-
     - name: Apply fail2ban role
       ansible.builtin.import_role:
         name: fail2ban
@@ -122,11 +113,6 @@
       ansible.builtin.import_role:
         name: ansible
       tags: [ansible]
-
-    - name: Apply kubernetes_tools role
-      ansible.builtin.import_role:
-        name: kubernetes_tools
-      tags: [kube]
 
     - name: Apply docker role
       ansible.builtin.import_role:

@@ -1,4 +1,4 @@
-# Additional packages for sandbox nodes.
+# Additional packages for regular nodes.
 common_packages_extra:
   - gnupg
   - apt-transport-https
