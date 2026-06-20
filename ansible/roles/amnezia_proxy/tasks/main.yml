@@ -17,10 +17,18 @@
     group: root
     mode: "0750"
 
+- name: Ensure AmneziaWG config directory
+  ansible.builtin.file:
+    path: "{{ amnezia_proxy_dir }}/config"
+    state: directory
+    owner: root
+    group: root
+    mode: "0700"
+
 - name: Deploy AmneziaWG client config
   ansible.builtin.copy:
-    src: "{{ amnezia_awg_conf_src }}"
-    dest: "{{ amnezia_proxy_dir }}/awg.conf"
+    content: "{{ lookup('file', amnezia_awg_conf_src) | regex_replace('(?im)^\\s*DNS\\s*=.*\\n?', '') }}"
+    dest: "{{ amnezia_proxy_dir }}/config/{{ amnezia_conf_name }}"
     owner: root
     group: root
     mode: "0600"

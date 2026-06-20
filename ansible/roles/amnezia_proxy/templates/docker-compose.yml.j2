@@ -4,11 +4,14 @@ services:
     image: {{ amnezia_proxy_image }}
     container_name: {{ amnezia_proxy_container_name }}
     restart: unless-stopped
+    privileged: true
     cap_add:
       - NET_ADMIN
     devices:
       - /dev/net/tun:/dev/net/tun
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
     volumes:
-      - ./awg.conf:{{ amnezia_conf_mount }}:ro
+      - ./config:{{ amnezia_conf_dir_mount }}
     ports:
       - "{{ amnezia_socks_bind_ip }}:{{ amnezia_socks_port }}:1080"

@@ -28,6 +28,9 @@ H2 = 2
 H3 = 3
 H4 = 4
 
+PostUp = ip route replace 172.18.0.0/16 dev eth0 table 51820; ip route replace 192.168.1.0/24 via 172.18.0.1 dev eth0 table 51820
+PostDown = ip route del 172.18.0.0/16 table 51820 2>/dev/null || true; ip route del 192.168.1.0/24 table 51820 2>/dev/null || true
+
 [Peer]
 # server public key
 PublicKey = CHANGE_ME_SERVER_PUBLIC_KEY

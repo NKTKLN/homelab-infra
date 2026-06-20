@@ -60,6 +60,21 @@ config from the Amnezia app and place it at:
 sensitive/amnezia/awg.conf
 ```
 
+> [!NOTE]
+> The AmneziaWG config may need explicit route exceptions so the SOCKS5 proxy
+> remains reachable from the Docker bridge and the LAN while outbound traffic is
+> routed through AmneziaWG.
+>
+> Add the following lines to the `[Interface]` section of `sensitive/amnezia/awg.conf`:
+>
+> ```ini
+> PostUp = ip route replace 172.18.0.0/16 dev eth0 table 51820; ip route replace 192.168.1.0/24 via 172.18.0.1 dev eth0 table 51820
+> PostDown = ip route del 172.18.0.0/16 table 51820 2>/dev/null || true; ip route del 192.168.1.0/24 table 51820 2>/dev/null || true
+> ```
+>
+> Adjust `172.18.0.0/16`, `172.18.0.1`, and `192.168.1.0/24` if the Docker
+> network or LAN subnet is different.
+
 ## 🚀 Workflow
 
 ### Infrastructure
