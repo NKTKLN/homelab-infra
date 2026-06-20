@@ -1,0 +1,15 @@
+# AmneziaWG client + SOCKS5 proxy (runs as a Docker container)
+amnezia_proxy_dir: /opt/amnezia-proxy
+amnezia_proxy_image: "sub1g/amneziawg-socks5:latest"
+amnezia_proxy_container_name: amneziawg-socks5
+
+# SOCKS5 listener
+amnezia_socks_port: 1080
+# Bind the SOCKS port to the host's LAN IP only (not 0.0.0.0)
+amnezia_socks_bind_ip: "{{ ansible_host }}"
+# Restrict inbound access to the SOCKS port to this network
+amnezia_socks_lan_cidr: "192.168.1.0/24"
+
+# AmneziaWG client config exported from Amnezia (kept out of git).
+# Place the exported file at the path below before running the role.
+amnezia_awg_conf_src: "{{ playbook_dir }}/../../sensitive/amnezia/awg.conf"

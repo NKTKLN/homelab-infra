@@ -1,0 +1,14 @@
+# {{ ansible_managed }}
+services:
+  amneziawg-socks5:
+    image: {{ amnezia_proxy_image }}
+    container_name: {{ amnezia_proxy_container_name }}
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    volumes:
+      - ./awg.conf:/config/wg0.conf:ro
+    ports:
+      - "{{ amnezia_socks_bind_ip }}:{{ amnezia_socks_port }}:1080"

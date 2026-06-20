@@ -39,6 +39,7 @@
       - docker-ce
       - docker-ce-cli
       - containerd.io
+      - docker-compose-plugin
     state: present
 
 - name: Ensure Docker service is enabled and running

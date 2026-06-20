@@ -1,0 +1,5 @@
+- name: restart amnezia proxy
+  ansible.builtin.command:
+    cmd: docker compose up -d --force-recreate
+    chdir: "{{ amnezia_proxy_dir }}"
+  changed_when: true

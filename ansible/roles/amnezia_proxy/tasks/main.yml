@@ -1,0 +1,53 @@
+- name: Ensure Debian family
+  ansible.builtin.assert:
+    that: ansible_facts.os_family == "Debian"
+    fail_msg: "This role supports only Debian/Ubuntu."
+
+- name: Ensure TUN kernel module is loaded
+  community.general.modprobe:
+    name: tun
+    state: present
+    persistent: present
+
+- name: Ensure project directory
+  ansible.builtin.file:
+    path: "{{ amnezia_proxy_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0750"
+
+- name: Deploy AmneziaWG client config
+  ansible.builtin.copy:
+    src: "{{ amnezia_awg_conf_src }}"
+    dest: "{{ amnezia_proxy_dir }}/awg.conf"
+    owner: root
+    group: root
+    mode: "0600"
+  notify: restart amnezia proxy
+
+- name: Deploy docker-compose.yml
+  ansible.builtin.template:
+    src: docker-compose.yml.j2
+    dest: "{{ amnezia_proxy_dir }}/docker-compose.yml"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: restart amnezia proxy
+
+- name: Ensure AmneziaWG SOCKS5 proxy is running
+  ansible.builtin.command:
+    cmd: docker compose up -d
+    chdir: "{{ amnezia_proxy_dir }}"
+  register: amnezia_compose
+  changed_when: >-
+    ('Started' in amnezia_compose.stderr)
+    or ('Created' in amnezia_compose.stderr)
+    or ('Recreated' in amnezia_compose.stderr)
+
+- name: Allow SOCKS5 port from LAN
+  community.general.ufw:
+    rule: allow
+    src: "{{ amnezia_socks_lan_cidr }}"
+    port: "{{ amnezia_socks_port }}"
+    proto: tcp
