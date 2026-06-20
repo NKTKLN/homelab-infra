@@ -106,7 +106,7 @@ locals {
     }
 
     "ct-caddy" = {
-      hostname        = "caddy-gateway"
+      hostname        = "ct-caddy"
       cores           = 1
       memory          = 512
       disk_size       = 8
