@@ -8,29 +8,33 @@ password. The token values go into `terraform/envs/prod/terraform.tfvars`.
 On a Proxmox node:
 
 ```bash
-pveum role add TerraformProv -privs "VM.Allocate VM.Config.* VM.PowerMgmt Datastore.AllocateSpace Datastore.AllocateTemplate Sys.Audit"
+# create role in PVE 8
+pveum role add Terraform -privs "Datastore.Allocate \
+  Datastore.AllocateSpace Datastore.AllocateTemplate \
+  Datastore.Audit Pool.Allocate Sys.Audit Sys.Console Sys.Modify \
+  SDN.Use VM.Allocate VM.Audit VM.Clone VM.Config.CDROM \
+  VM.Config.Cloudinit VM.Config.CPU VM.Config.Disk VM.Config.HWType \
+  VM.Config.Memory VM.Config.Network VM.Config.Options VM.Migrate \
+  VM.PowerMgmt User.Modify Mapping.Modify"
 
-pveum user add terraform-prov@pve --password <password>
+# create group
+pveum group add terraform-users
 
-pveum aclmod / -user terraform-prov@pve -role TerraformProv
+# add permissions
+pveum acl modify / -group terraform-users -role Terraform
+
+# create user 'terraform'
+pveum useradd terraform@pve -groups terraform-users
+
+# generate a token
+pveum user token add terraform@pve token -privsep 0
 ```
 
-## 2. Create API token
-
-In the **Proxmox Web UI**:
-
-1. Datacenter → Permissions → API Tokens
-2. Click **Add**
-3. User: `terraform-prov@pve`
-4. Token ID: `terraform`
-5. Disable **Privilege separation** (recommended for simplicity)
-6. Save and copy the **Secret**
-
-## 3. Use in Terraform
+## 2. Use in Terraform
 
 ```hcl
 pve_api_url      = "https://<host>:8006/api2/json"
-pve_token_id     = "terraform-prov@pve!terraform"
+pve_token_id     = "terraform@pve!token"
 pve_token_secret = "<secret>"
 pve_ssh_username = "root"
 ```

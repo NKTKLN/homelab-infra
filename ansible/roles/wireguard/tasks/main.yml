@@ -15,11 +15,19 @@
       wireguard_password_hash must be set. Generate one with:
       docker run --rm {{ wireguard_image }} wgpw 'your-password'
 
-- name: Ensure TUN kernel module is loaded
-  community.general.modprobe:
-    name: tun
-    state: present
-    persistent: present
+- name: Ensure TUN device is available
+  ansible.builtin.stat:
+    path: /dev/net/tun
+  register: wireguard_tun_dev
+
+- name: Fail if TUN device is missing
+  ansible.builtin.assert:
+    that: wireguard_tun_dev.stat.exists
+    fail_msg: >-
+      /dev/net/tun is not present in this container. Kernel modules cannot be
+      loaded from inside an unprivileged LXC guest. Load the 'tun' module on the
+      Proxmox host (e.g. add 'tun' to /etc/modules-load.d/) and pass the device
+      through to this container.
 
 - name: Ensure project directory
   ansible.builtin.file:

@@ -18,6 +18,8 @@ services:
       - UI_TRAFFIC_STATS={{ wireguard_ui_traffic_stats | lower }}
     volumes:
       - ./config:/etc/wireguard
+    devices:
+      - /dev/net/tun:/dev/net/tun
     ports:
       - "{{ wireguard_port }}:51820/udp"
       - "{{ wireguard_ui_bind_ip }}:{{ wireguard_ui_port }}:{{ wireguard_ui_port }}/tcp"

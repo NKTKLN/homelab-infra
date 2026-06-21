@@ -5,7 +5,7 @@ env:
   ANSIBLE_DIR: 'ansible'
   SCRIPTS_DIR: 'scripts'
 
-  TF_PROVIDER: '{{.TF_PROVIDER | default "tofu"}}'
+  TF_PROVIDER: '{{.TF_PROVIDER | default "terraform"}}'
 
   ANSIBLE_INVENTORY: 'inventory/home/hosts.ini'
 
