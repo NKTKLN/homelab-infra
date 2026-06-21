@@ -81,11 +81,6 @@
   hosts: nodes
   become: true
   tasks:
-    - name: Apply zsh role
-      ansible.builtin.import_role:
-        name: zsh
-      tags: [shell]
-
     - name: Apply docker role
       ansible.builtin.import_role:
         name: docker

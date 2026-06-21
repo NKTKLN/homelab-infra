@@ -39,7 +39,7 @@ locals {
     "vm-ops-node" = {
       hostname        = "vm-ops-node"
       cores           = 2
-      memory          = 2048
+      memory          = 3072
       disk_size       = 20
       ipaddr          = "192.168.1.13/24"
       virtiofs        = []

@@ -3,7 +3,7 @@ sysctl_settings:
   net.ipv4.ip_forward: 1
 
 # wg-easy (WireGuard with web UI)
-wireguard_endpoint: "192.168.1.11"
+wireguard_endpoint: "CHANGE_ME_PUBLIC_IP"
 wireguard_client_address_range: "10.10.10.x"
 wireguard_dns: "1.1.1.1"
 wireguard_lan_cidr: "192.168.1.0/24"
