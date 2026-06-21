@@ -90,14 +90,10 @@ task tf-apply    # apply changes
 task ansible-deploy  # lint → check → apply
 ```
 
----
-
 ## 📚 Documentation
 
 * [Proxmox API token](./docs/proxmox-api.md) — create the token Terraform uses
 * [GPU / PCI passthrough](./docs/pci-passthrough.md) — attach a GPU to the worker node
-
----
 
 ## 📜 License
 
