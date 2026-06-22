@@ -1,9 +1,13 @@
 # Docker context
 docker_user: "{{ ansible_user }}"
-docker_context_target_host: vm-node-1
-docker_context_name: homelab-node-1
-docker_context_user: "{{ hostvars[docker_context_target_host]['ansible_user'] }}"
-docker_context_host: "{{ hostvars[docker_context_target_host]['ansible_host'] }}"
-docker_context_port: "{{ hostvars[docker_context_target_host]['ansible_port'] | default(22) }}"
-docker_context_endpoint: >-
-  ssh://{{ docker_context_user }}@{{ docker_context_host }}:{{ docker_context_port }}
+
+# List of Docker contexts to create. Each item points at an inventory host
+# whose connection details are used to build the SSH endpoint.
+docker_contexts:
+  - name: homelab-node-1
+    target_host: vm-node-1
+  - name: homelab-gpu-worker-1
+    target_host: vm-gpu-worker-1
+
+# Context to activate after creation
+docker_context_use: "{{ docker_contexts[0].name }}"

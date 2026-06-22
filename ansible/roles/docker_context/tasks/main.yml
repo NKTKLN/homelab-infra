@@ -1,29 +1,35 @@
 - name: Check existing Docker contexts
   ansible.builtin.command: docker context ls --format '{{"{{.Name}}"}}'
-  register: docker_contexts
+  register: docker_contexts_existing
   changed_when: false
   become: true
   become_user: "{{ docker_user }}"
 
-- name: Create Docker context for worker
+- name: Create Docker contexts for workers
   ansible.builtin.command:
     argv:
       - docker
       - context
       - create
-      - "{{ docker_context_name }}"
+      - "{{ item.name }}"
       - --docker
-      - "host={{ docker_context_endpoint }}"
-  when: docker_context_name not in docker_contexts.stdout_lines
+      - >-
+        host=ssh://{{ hostvars[item.target_host]['ansible_user'] }}@{{
+        hostvars[item.target_host]['ansible_host'] }}:{{
+        hostvars[item.target_host]['ansible_port'] | default(22) }}
+  loop: "{{ docker_contexts }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: item.name not in docker_contexts_existing.stdout_lines
   become: true
   become_user: "{{ docker_user }}"
 
-- name: Apply Docker context for worker
+- name: Apply default Docker context
   ansible.builtin.command:
     argv:
       - docker
       - context
       - use
-      - "{{ docker_context_name }}"
+      - "{{ docker_context_use }}"
   become: true
   become_user: "{{ docker_user }}"
