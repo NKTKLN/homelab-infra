@@ -51,7 +51,7 @@ locals {
     "vm-gpu-worker-1" = {
       hostname        = "vm-gpu-worker-1"
       cores           = 4
-      memory          = 4096
+      memory          = 8196
       disk_size       = 60
       ipaddr          = "192.168.1.14/24"
       virtiofs        = []
