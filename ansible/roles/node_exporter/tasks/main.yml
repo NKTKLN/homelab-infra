@@ -1,0 +1,45 @@
+- name: Ensure Debian family
+  ansible.builtin.assert:
+    that: ansible_facts.os_family == "Debian"
+    fail_msg: "This role supports only Debian/Ubuntu."
+
+- name: Ensure project directory
+  ansible.builtin.file:
+    path: "{{ node_exporter_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0750"
+
+- name: Deploy docker-compose.yml
+  ansible.builtin.template:
+    src: docker-compose.yml.j2
+    dest: "{{ node_exporter_dir }}/docker-compose.yml"
+    owner: root
+    group: root
+    mode: "0640"
+  notify: restart node-exporter
+
+- name: Ensure node-exporter is running
+  ansible.builtin.command:
+    cmd: docker compose up -d
+    chdir: "{{ node_exporter_dir }}"
+  register: node_exporter_compose
+  changed_when: >-
+    ('Started' in node_exporter_compose.stderr)
+    or ('Created' in node_exporter_compose.stderr)
+    or ('Recreated' in node_exporter_compose.stderr)
+
+- name: Allow node-exporter metrics port from LAN
+  community.general.ufw:
+    rule: allow
+    src: "{{ node_exporter_lan_cidr }}"
+    port: "{{ node_exporter_port }}"
+    proto: tcp
+
+- name: Allow node-exporter metrics port from local Docker bridges
+  community.general.ufw:
+    rule: allow
+    src: "{{ node_exporter_docker_cidr }}"
+    port: "{{ node_exporter_port }}"
+    proto: tcp

@@ -40,7 +40,7 @@ locals {
       hostname        = "vm-ops-node"
       cores           = 2
       memory          = 3072
-      disk_size       = 20
+      disk_size       = 64
       ipaddr          = "192.168.1.13/24"
       virtiofs        = []
       pci_devices     = []
@@ -95,6 +95,14 @@ locals {
           proto   = "udp"
           dport   = "51820"
           comment = "Allow Wireguard"
+        },
+        {
+          action  = "ACCEPT"
+          type    = "in"
+          proto   = "tcp"
+          dport   = "9100"
+          source  = "192.168.1.0/24"
+          comment = "Allow node_exporter scrape from LAN"
         },
         {
           action  = "DROP"

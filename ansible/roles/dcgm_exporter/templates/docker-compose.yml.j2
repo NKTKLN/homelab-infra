@@ -1,0 +1,13 @@
+# {{ ansible_managed }}
+services:
+  dcgm-exporter:
+    image: {{ dcgm_exporter_image }}
+    container_name: {{ dcgm_exporter_container_name }}
+    restart: unless-stopped
+    runtime: nvidia
+    cap_add:
+      - SYS_ADMIN
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+    ports:
+      - "{{ dcgm_exporter_bind_ip }}:{{ dcgm_exporter_port }}:9400"

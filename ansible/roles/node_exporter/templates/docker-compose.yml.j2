@@ -1,0 +1,16 @@
+# {{ ansible_managed }}
+services:
+  node-exporter:
+    image: {{ node_exporter_image }}
+    container_name: {{ node_exporter_container_name }}
+    restart: unless-stopped
+    command:
+      - "--path.rootfs=/host"
+      - "--path.procfs=/host/proc"
+      - "--path.sysfs=/host/sys"
+      - "--web.listen-address={{ node_exporter_bind_ip }}:{{ node_exporter_port }}"
+      - "--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)"
+    network_mode: host
+    pid: host
+    volumes:
+      - /:/host:ro,rslave

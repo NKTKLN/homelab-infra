@@ -1,0 +1,5 @@
+- name: restart dcgm-exporter
+  ansible.builtin.command:
+    cmd: docker compose up -d --force-recreate
+    chdir: "{{ dcgm_exporter_dir }}"
+  changed_when: true

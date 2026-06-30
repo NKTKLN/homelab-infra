@@ -1,0 +1,8 @@
+# Host vars for vm-vpn (wg-easy WireGuard server)
+
+# --- wg-easy web UI admin password (bcrypt hash) ---
+# Generate with:
+#   docker run --rm ghcr.io/wg-easy/wg-easy:14 wgpw 'your-password'
+# DO NOT commit the real hash — override via ansible-vault, e.g.:
+#   ansible-vault encrypt_string '$2y$10$...' --name wireguard_password_hash
+wireguard_password_hash: ""            # CHANGE_ME (keep in vault)

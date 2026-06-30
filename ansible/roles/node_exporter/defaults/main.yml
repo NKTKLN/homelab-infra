@@ -1,0 +1,16 @@
+# Prometheus node_exporter — host metrics (runs as a Docker container)
+node_exporter_dir: /opt/node-exporter
+node_exporter_image: "prom/node-exporter:v1.9.1"
+node_exporter_container_name: node-exporter
+
+# Metrics listener
+node_exporter_port: 9100
+# Bind the metrics port to the host's LAN IP only (not 0.0.0.0)
+node_exporter_bind_ip: "{{ ansible_host }}"
+# Restrict inbound access to the metrics port to this network
+node_exporter_lan_cidr: "192.168.1.0/24"
+# Docker bridge pool — needed so a Prometheus container co-located on the same
+# host can scrape this exporter. A bridge-network container reaching the host's
+# LAN IP arrives with a 172.x source, which the LAN rule above would drop.
+# Covers docker0 (172.17/16) and Compose-created networks (172.18/16, …).
+node_exporter_docker_cidr: "172.16.0.0/12"

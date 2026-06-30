@@ -1,0 +1,152 @@
+groups:
+  # ---------------------------------------------------------------------------
+  # Availability
+  # ---------------------------------------------------------------------------
+  - name: availability
+    rules:
+      - alert: InstanceDown
+        expr: up == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "{{ $labels.instance }} is down"
+          description: "Target {{ $labels.instance }} (job {{ $labels.job }}) has been unreachable for more than 2 minutes."
+
+      - alert: ControlNodeDown
+        expr: up{role="operations"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          scope: control
+        annotations:
+          summary: "Control node {{ $labels.instance }} is down"
+          description: "The management/control node has been unreachable for more than 1 minute. Ansible, docker context and the monitoring stack run here."
+
+      - alert: NetworkNodesDown
+        # Fires only when *both* network nodes (VPN + proxy) are unreachable.
+        expr: sum(up{role=~"vpn|proxy"}) == 0
+        for: 2m
+        labels:
+          severity: critical
+          scope: network
+        annotations:
+          summary: "All network nodes are down"
+          description: "Both network nodes (VPN and proxy) have been unreachable for more than 2 minutes — outbound/VPN connectivity is likely lost."
+
+  # ---------------------------------------------------------------------------
+  # Host resources
+  # ---------------------------------------------------------------------------
+  - name: host-resources
+    rules:
+      - alert: HostDiskSpaceLow
+        # Warning at >80% used (i.e. <20% available).
+        expr: |
+          (node_filesystem_avail_bytes{fstype!~"tmpfs|overlay|squashfs|ramfs"}
+            / node_filesystem_size_bytes{fstype!~"tmpfs|overlay|squashfs|ramfs"}) * 100 < 20
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Low disk space on {{ $labels.instance }} ({{ $labels.mountpoint }})"
+          description: "Filesystem {{ $labels.mountpoint }} on {{ $labels.device }} is above 80% used ({{ $value | printf \"%.1f\" }}% free)."
+
+      - alert: HostDiskSpaceLow
+        # Critical at >90% used (i.e. <10% available).
+        expr: |
+          (node_filesystem_avail_bytes{fstype!~"tmpfs|overlay|squashfs|ramfs"}
+            / node_filesystem_size_bytes{fstype!~"tmpfs|overlay|squashfs|ramfs"}) * 100 < 10
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Critically low disk space on {{ $labels.instance }} ({{ $labels.mountpoint }})"
+          description: "Filesystem {{ $labels.mountpoint }} on {{ $labels.device }} is above 90% used ({{ $value | printf \"%.1f\" }}% free)."
+
+      - alert: HostFilesystemReadOnly
+        expr: node_filesystem_readonly{fstype!~"tmpfs|overlay|squashfs|ramfs"} == 1
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Filesystem mounted read-only on {{ $labels.instance }}"
+          description: "Filesystem {{ $labels.mountpoint }} on {{ $labels.device }} has been remounted read-only — usually a sign of disk/IO errors."
+
+      - alert: HostHighMemory
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 85
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage on {{ $labels.instance }}"
+          description: "Memory usage is above 85% for more than 10 minutes (current: {{ $value | printf \"%.1f\" }}%)."
+
+      - alert: HostHighCpu
+        expr: 100 - (avg without (cpu) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 85
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage on {{ $labels.instance }}"
+          description: "CPU usage is above 85% for more than 15 minutes (current: {{ $value | printf \"%.1f\" }}%)."
+
+      - alert: HostHighLoad
+        # 5-minute load average above 1.5x the number of CPU cores.
+        expr: node_load5 > 1.5 * count without (cpu, mode) (node_cpu_seconds_total{mode="idle"})
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High load average on {{ $labels.instance }}"
+          description: "load5 ({{ $value | printf \"%.2f\" }}) is above 1.5x the core count for more than 10 minutes."
+
+      - alert: HostNetworkErrors
+        expr: |
+          (
+            rate(node_network_receive_errs_total{device!~"lo|veth.*|docker.*|br-.*"}[5m])
+            + rate(node_network_transmit_errs_total{device!~"lo|veth.*|docker.*|br-.*"}[5m])
+            + rate(node_network_receive_drop_total{device!~"lo|veth.*|docker.*|br-.*"}[5m])
+            + rate(node_network_transmit_drop_total{device!~"lo|veth.*|docker.*|br-.*"}[5m])
+          ) > 1
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Network errors/drops on {{ $labels.instance }} ({{ $labels.device }})"
+          description: "Interface {{ $labels.device }} is seeing more than 1 error/drop per second ({{ $value | printf \"%.2f\" }}/s) over the last 10 minutes."
+
+  # ---------------------------------------------------------------------------
+  # GPU (NVIDIA DCGM exporter)
+  # ---------------------------------------------------------------------------
+  - name: gpu
+    rules:
+      - alert: GpuHighTemperature
+        expr: DCGM_FI_DEV_GPU_TEMP > 85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High GPU temperature on {{ $labels.instance }} (GPU {{ $labels.gpu }})"
+          description: "GPU {{ $labels.gpu }} temperature is above 85°C for more than 5 minutes (current: {{ $value }}°C)."
+
+      - alert: GpuHighMemoryUsage
+        expr: |
+          DCGM_FI_DEV_FB_USED
+            / (DCGM_FI_DEV_FB_USED + DCGM_FI_DEV_FB_FREE) * 100 > 90
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High GPU memory usage on {{ $labels.instance }} (GPU {{ $labels.gpu }})"
+          description: "GPU {{ $labels.gpu }} framebuffer usage is above 90% for more than 10 minutes (current: {{ $value | printf \"%.1f\" }}%)."
+
+      - alert: GpuXidErrors
+        # XID errors indicate GPU faults (Xexpr / driver / ECC). Metric is only
+        # present on newer DCGM exporter builds — the rule is a no-op otherwise.
+        expr: increase(DCGM_FI_DEV_XID_ERRORS[5m]) > 0
+        for: 0m
+        labels:
+          severity: critical
+        annotations:
+          summary: "GPU XID error on {{ $labels.instance }} (GPU {{ $labels.gpu }})"
+          description: "GPU {{ $labels.gpu }} reported an XID error in the last 5 minutes (count: {{ $value }})."

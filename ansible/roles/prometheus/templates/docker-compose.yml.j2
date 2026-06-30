@@ -1,0 +1,39 @@
+# {{ ansible_managed }}
+services:
+  prometheus:
+    image: {{ prometheus_image }}
+    container_name: {{ prometheus_container_name }}
+    restart: unless-stopped
+    user: "{{ prometheus_run_uid }}:{{ prometheus_run_gid }}"
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time={{ prometheus_retention_time }}"
+{% if prometheus_retention_size | length > 0 %}
+      - "--storage.tsdb.retention.size={{ prometheus_retention_size }}"
+{% endif %}
+      - "--web.enable-lifecycle"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./rules:/etc/prometheus/rules:ro
+      - prometheus-data:/prometheus
+    ports:
+      - "{{ prometheus_bind_ip }}:{{ prometheus_port }}:9090"
+
+  alertmanager:
+    image: {{ prometheus_alertmanager_image }}
+    container_name: {{ prometheus_alertmanager_container_name }}
+    restart: unless-stopped
+    user: "{{ prometheus_run_uid }}:{{ prometheus_run_gid }}"
+    command:
+      - "--config.file=/etc/alertmanager/alertmanager.yml"
+      - "--storage.path=/alertmanager"
+    volumes:
+      - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - alertmanager-data:/alertmanager
+    ports:
+      - "{{ prometheus_bind_ip }}:{{ prometheus_alertmanager_port }}:9093"
+
+volumes:
+  prometheus-data:
+  alertmanager-data:

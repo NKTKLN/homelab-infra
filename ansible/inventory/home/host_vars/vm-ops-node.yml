@@ -1,0 +1,12 @@
+# Host vars for vm-ops-node (monitoring control plane: Prometheus + Alertmanager)
+
+# --- Alertmanager → Telegram ---
+# Bot token from @BotFather and the target chat/channel id.
+# DO NOT commit the real token — override these via ansible-vault, e.g.:
+#   ansible-vault encrypt_string '123456:ABC-...' --name prometheus_alertmanager_telegram_bot_token
+prometheus_alertmanager_telegram_bot_token: ""            # CHANGE_ME (keep in vault)
+prometheus_alertmanager_telegram_chat_id: 0             # CHANGE_ME (channels are negative, e.g. -1001234567890)
+
+# Telegram API is reached through the AmneziaWG SOCKS5 proxy on vm-amnezia-proxy
+# (amnezia_proxy role: SOCKS5 on port 1080, bound to its LAN IP).
+prometheus_alertmanager_telegram_proxy_url: "socks5://192.168.1.20:1080"

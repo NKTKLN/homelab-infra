@@ -1,0 +1,23 @@
+- name: restart prometheus stack
+  ansible.builtin.command:
+    cmd: docker compose up -d --force-recreate
+    chdir: "{{ prometheus_dir }}"
+  changed_when: true
+
+- name: restart alertmanager
+  ansible.builtin.command:
+    cmd: docker compose restart alertmanager
+    chdir: "{{ prometheus_dir }}"
+  changed_when: true
+
+# Hot-reload Prometheus config/rules without dropping the TSDB
+# (requires --web.enable-lifecycle, set in docker-compose.yml.j2).
+- name: reload prometheus
+  ansible.builtin.uri:
+    url: "http://{{ prometheus_bind_ip }}:{{ prometheus_port }}/-/reload"
+    method: POST
+    status_code: [200, 204]
+  retries: 5
+  delay: 3
+  register: prometheus_reload
+  until: prometheus_reload is succeeded

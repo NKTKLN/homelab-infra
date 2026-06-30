@@ -63,6 +63,11 @@
         name: cuda_tools
       tags: [cuda]
 
+    - name: Apply dcgm_exporter role
+      ansible.builtin.import_role:
+        name: dcgm_exporter
+      tags: [monitoring, dcgm]
+
 - name: Amnezia proxy servers
   hosts: proxy
   become: true
@@ -123,3 +128,17 @@
       ansible.builtin.import_role:
         name: docker_context
       tags: [docker, docker_context]
+
+    - name: Apply prometheus role
+      ansible.builtin.import_role:
+        name: prometheus
+      tags: [monitoring, prometheus]
+
+- name: Node exporter for all VMs
+  hosts: vms
+  become: true
+  tasks:
+    - name: Apply node_exporter role
+      ansible.builtin.import_role:
+        name: node_exporter
+      tags: [monitoring, node_exporter]

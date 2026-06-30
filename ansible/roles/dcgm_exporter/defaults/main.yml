@@ -1,0 +1,12 @@
+# NVIDIA DCGM Exporter — GPU metrics (runs as a Docker container).
+# Requires the NVIDIA driver + Container Toolkit (see cuda_tools role).
+dcgm_exporter_dir: /opt/dcgm-exporter
+dcgm_exporter_image: "nvcr.io/nvidia/k8s/dcgm-exporter:4.1.1-4.0.4-ubuntu22.04"
+dcgm_exporter_container_name: dcgm-exporter
+
+# Metrics listener
+dcgm_exporter_port: 9400
+# Bind the metrics port to the host's LAN IP only (not 0.0.0.0)
+dcgm_exporter_bind_ip: "{{ ansible_host }}"
+# Restrict inbound access to the metrics port to this network
+dcgm_exporter_lan_cidr: "192.168.1.0/24"

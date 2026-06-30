@@ -1,0 +1,80 @@
+- name: Ensure Debian family
+  ansible.builtin.assert:
+    that: ansible_facts.os_family == "Debian"
+    fail_msg: "This role supports only Debian/Ubuntu."
+
+- name: Ensure project directory
+  ansible.builtin.file:
+    path: "{{ prometheus_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0750"
+
+- name: Ensure alert rules directory
+  ansible.builtin.file:
+    path: "{{ prometheus_dir }}/rules"
+    state: directory
+    owner: "{{ prometheus_run_uid }}"
+    group: "{{ prometheus_run_gid }}"
+    mode: "0750"
+
+- name: Deploy alert rules
+  ansible.builtin.copy:
+    src: rules/
+    dest: "{{ prometheus_dir }}/rules/"
+    owner: "{{ prometheus_run_uid }}"
+    group: "{{ prometheus_run_gid }}"
+    mode: "0640"
+  notify: reload prometheus
+
+- name: Deploy prometheus.yml
+  ansible.builtin.template:
+    src: prometheus.yml.j2
+    dest: "{{ prometheus_dir }}/prometheus.yml"
+    owner: "{{ prometheus_run_uid }}"
+    group: "{{ prometheus_run_gid }}"
+    mode: "0640"
+  notify: reload prometheus
+
+- name: Deploy alertmanager.yml
+  ansible.builtin.template:
+    src: alertmanager.yml.j2
+    dest: "{{ prometheus_dir }}/alertmanager.yml"
+    owner: "{{ prometheus_run_uid }}"
+    group: "{{ prometheus_run_gid }}"
+    mode: "0640"
+  notify: restart alertmanager
+
+- name: Deploy docker-compose.yml
+  ansible.builtin.template:
+    src: docker-compose.yml.j2
+    dest: "{{ prometheus_dir }}/docker-compose.yml"
+    owner: root
+    group: root
+    mode: "0640"
+  notify: restart prometheus stack
+
+- name: Ensure monitoring stack is running
+  ansible.builtin.command:
+    cmd: docker compose up -d
+    chdir: "{{ prometheus_dir }}"
+  register: prometheus_compose
+  changed_when: >-
+    ('Started' in prometheus_compose.stderr)
+    or ('Created' in prometheus_compose.stderr)
+    or ('Recreated' in prometheus_compose.stderr)
+
+- name: Allow Prometheus web port from LAN
+  community.general.ufw:
+    rule: allow
+    src: "{{ prometheus_lan_cidr }}"
+    port: "{{ prometheus_port }}"
+    proto: tcp
+
+- name: Allow Alertmanager web port from LAN
+  community.general.ufw:
+    rule: allow
+    src: "{{ prometheus_lan_cidr }}"
+    port: "{{ prometheus_alertmanager_port }}"
+    proto: tcp

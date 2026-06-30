@@ -1,0 +1,55 @@
+# Prometheus + Alertmanager monitoring stack (runs as Docker containers)
+prometheus_dir: /opt/prometheus
+
+prometheus_image: "prom/prometheus:v3.2.1"
+prometheus_container_name: prometheus
+prometheus_alertmanager_image: "prom/alertmanager:v0.28.1"
+prometheus_alertmanager_container_name: alertmanager
+
+# The prom/prometheus and prom/alertmanager images both run as the "nobody"
+# user (uid/gid 65534). Mounted config files must be owned by / readable by
+# this user, and the containers are pinned to it explicitly.
+prometheus_run_uid: "65534"
+prometheus_run_gid: "65534"
+
+# Listeners
+prometheus_port: 9090
+prometheus_alertmanager_port: 9093
+# Bind the web ports to the host's LAN IP only (not 0.0.0.0)
+prometheus_bind_ip: "{{ ansible_host }}"
+# Restrict inbound access to the web ports to this network
+prometheus_lan_cidr: "192.168.1.0/24"
+
+# TSDB retention (time and/or size; size empty = unlimited)
+prometheus_retention_time: "30d"
+prometheus_retention_size: "40GB"
+# How often Prometheus scrapes targets / evaluates rules
+prometheus_scrape_interval: "15s"
+prometheus_evaluation_interval: "15s"
+
+# Alertmanager Telegram notifications. Leave the bot token empty to disable
+# delivery (alerts stay visible in the Alertmanager UI either way).
+# Keep the real token out of git — set via ansible-vault / host_vars.
+prometheus_alertmanager_telegram_bot_token: ""
+# Numeric chat/channel id (for channels it is negative, e.g. -1001234567890).
+prometheus_alertmanager_telegram_chat_id: 0
+prometheus_alertmanager_telegram_parse_mode: "HTML"
+# Also notify when an alert resolves
+prometheus_alertmanager_telegram_send_resolved: true
+# Optional proxy for reaching the Telegram API (e.g. when the host has no
+# direct internet access). Empty = direct connection. Use http(s):// or
+# socks5:// — note Alertmanager's Go client does NOT support the socks5h://
+# scheme (it silently connects directly). For this homelab it points at the
+# AmneziaWG SOCKS5 proxy (see amnezia_proxy role).
+prometheus_alertmanager_telegram_proxy_url: ""
+
+# Inventory groups + ports the exporters listen on (see node_exporter / dcgm_exporter roles)
+prometheus_node_group: vms
+prometheus_node_exporter_port: 9100
+prometheus_dcgm_group: gpu-workers
+prometheus_dcgm_exporter_port: 9400
+
+# Functional inventory groups used to derive each target's `role` label
+# (first match wins). Drives the control-node / network-node alerts and the
+# Alertmanager grouping/inhibition.
+prometheus_role_groups: [operations, nodes, gpu-workers, proxy, vpn, gateway]
