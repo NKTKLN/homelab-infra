@@ -17,6 +17,7 @@ services:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - ./rules:/etc/prometheus/rules:ro
       - prometheus-data:/prometheus
+      - /etc/localtime:/etc/localtime:ro
     ports:
       - "{{ prometheus_bind_ip }}:{{ prometheus_port }}:9090"
 
@@ -31,6 +32,7 @@ services:
     volumes:
       - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
       - alertmanager-data:/alertmanager
+      - /etc/localtime:/etc/localtime:ro
     ports:
       - "{{ prometheus_bind_ip }}:{{ prometheus_alertmanager_port }}:9093"
 

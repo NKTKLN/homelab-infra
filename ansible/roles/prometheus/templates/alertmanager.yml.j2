@@ -69,7 +69,7 @@ receivers:
           {{ if eq .Status "resolved" }}🟢{{ else if eq .Labels.severity "critical" }}🔴{{ else }}🟡{{ end }} <b>{{ .Labels.alertname }}</b>{{ if .Labels.instance }} — <code>{{ .Labels.instance }}</code>{{ end }}
           {{ if .Annotations.summary }}{{ .Annotations.summary }}
           {{ end }}<b>severity:</b> {{ .Labels.severity }}{{ if .Labels.role }} · <b>role:</b> {{ .Labels.role }}{{ end }}
-          <b>since:</b> {{ .StartsAt.Format "2006-01-02 15:04 MST" }}
+          <b>since:</b> {{ .StartsAt.Local.Format "2006-01-02 15:04 MST" }}
           {{ if .Annotations.description }}{{ .Annotations.description }}
           {{ end }}{{ end -}}
           {%- endraw %}
