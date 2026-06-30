@@ -1,0 +1,94 @@
+# {{ ansible_managed }}
+route:
+  receiver: default
+  # Batch alerts that share name + role into a single notification.
+  group_by: ["alertname", "role"]
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 4h
+  routes:
+    # Critical alerts page faster and re-notify more often.
+    - matchers:
+        - severity = "critical"
+      group_wait: 10s
+      repeat_interval: 1h
+
+inhibit_rules:
+  # 1. If a node is down, mute every other alert coming from that same node —
+  #    its metrics are stale/unreachable anyway, so we only want "it's down".
+  - source_matchers:
+      - alertname = "InstanceDown"
+    target_matchers:
+      - alertname != "InstanceDown"
+    equal: ["instance"]
+
+  # 2. ControlNodeDown is the dedicated page for the management node; mute the
+  #    generic InstanceDown for that same instance.
+  - source_matchers:
+      - alertname = "ControlNodeDown"
+    target_matchers:
+      - alertname = "InstanceDown"
+    equal: ["instance"]
+
+  # 3. "Both network nodes down" is the headline; mute the individual
+  #    InstanceDown alerts for the VPN/proxy nodes while it is firing.
+  - source_matchers:
+      - alertname = "NetworkNodesDown"
+    target_matchers:
+      - alertname = "InstanceDown"
+      - role =~ "vpn|proxy"
+
+  # 4. A critical mutes the matching warning for the same alert on the same
+  #    target (e.g. disk >90% mutes the disk >80% warning).
+  - source_matchers:
+      - severity = "critical"
+    target_matchers:
+      - severity = "warning"
+    equal: ["alertname", "instance", "device"]
+
+# -----------------------------------------------------------------------------
+# Notifications. Only the `default` receiver is wired into the route above, so
+# swapping channels is a one-place change: add slack_configs / discord_configs /
+# email_configs / webhook_configs below (or override the *_configs vars) and the
+# routing/grouping/inhibition keeps working unchanged.
+# -----------------------------------------------------------------------------
+receivers:
+  - name: default
+{% if prometheus_alertmanager_telegram_bot_token | length > 0 %}
+    telegram_configs:
+      - bot_token: "{{ prometheus_alertmanager_telegram_bot_token }}"
+        chat_id: {{ prometheus_alertmanager_telegram_chat_id }}
+        parse_mode: "{{ prometheus_alertmanager_telegram_parse_mode }}"
+        send_resolved: {{ prometheus_alertmanager_telegram_send_resolved | lower }}
+        # Rich HTML message with status/severity pictographs. The Go-template
+        # braces live inside a Jinja raw block so Jinja leaves them untouched.
+        message: |-
+          {% raw -%}
+          {{ if eq .Status "firing" }}🔥 <b>FIRING</b>{{ else }}✅ <b>RESOLVED</b>{{ end }} · {{ .Alerts | len }} alert(s)
+          {{ range .Alerts }}
+          {{ if eq .Status "resolved" }}🟢{{ else if eq .Labels.severity "critical" }}🔴{{ else }}🟡{{ end }} <b>{{ .Labels.alertname }}</b>{{ if .Labels.instance }} — <code>{{ .Labels.instance }}</code>{{ end }}
+          {{ if .Annotations.summary }}{{ .Annotations.summary }}
+          {{ end }}<b>severity:</b> {{ .Labels.severity }}{{ if .Labels.role }} · <b>role:</b> {{ .Labels.role }}{{ end }}
+          <b>since:</b> {{ .StartsAt.Format "2006-01-02 15:04 MST" }}
+          {{ if .Annotations.description }}{{ .Annotations.description }}
+          {{ end }}{{ end -}}
+          {%- endraw %}
+
+{% if prometheus_alertmanager_telegram_proxy_url | length > 0 %}
+        http_config:
+          proxy_url: "{{ prometheus_alertmanager_telegram_proxy_url }}"
+{% endif %}
+{% else %}
+    # No Telegram bot token set — alerts are grouped/visible in the
+    # Alertmanager UI but not delivered. Set the bot token + chat id via
+    # ansible-vault / group_vars to enable Telegram notifications.
+    #
+    # Example alternatives (drop in instead of telegram_configs):
+    #   slack_configs:
+    #     - api_url: "https://hooks.slack.com/services/XXX"   # or a Discord
+    #       channel: "#alerts"                                #   webhook + /slack
+    #       send_resolved: true
+    #   email_configs:
+    #     - to: "ops@example.com"
+    #       send_resolved: true
+{% endif %}
